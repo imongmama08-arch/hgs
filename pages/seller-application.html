@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Seller — REWEAR Lite</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <a href="../index.html">REWEAR Lite</a>
+                </div>
+                <h1 class="auth-title">Become a Seller</h1>
+                <p class="auth-subtitle">Apply to sell preloved fashion items on our marketplace</p>
+            </div>
+
+            <div class="auth-steps">
+                <div class="step active">1. Application</div>
+                <div class="step">2. Admin Review</div>
+                <div class="step">3. Dashboard Access</div>
+            </div>
+
+            <form class="auth-form" id="sellerApplicationForm">
+                <div class="form-section">
+                    <h3 class="form-section-title">Business Information</h3>
+                    
+                    <div class="form-group">
+                        <label for="businessName">Business Name *</label>
+                        <input type="text" id="businessName" name="businessName" required 
+                               placeholder="Your shop/brand name" maxlength="100">
+                        <div class="form-error" id="businessNameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessEmail">Business Email *</label>
+                        <input type="email" id="businessEmail" name="businessEmail" required 
+                               placeholder="contact@yourbusiness.com" autocomplete="email">
+                        <div class="form-error" id="businessEmailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessPhone">Business Phone</label>
+                        <input type="tel" id="businessPhone" name="businessPhone" 
+                               placeholder="0917XXXXXXX" pattern="[0-9]{11}">
+                        <div class="form-help">Philippine format: 09171234567</div>
+                        <div class="form-error" id="businessPhoneError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="businessAddress">Business Address</label>
+                        <textarea id="businessAddress" name="businessAddress" rows="3" 
+                                  placeholder="Street, City, Province"></textarea>
+                        <div class="form-error" id="businessAddressError"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">Business Details</h3>
+                    
+                    <div class="form-group">
+                        <label for="businessDescription">Business Description *</label>
+                        <textarea id="businessDescription" name="businessDescription" required 
+                                  rows="4" placeholder="Tell us about your business, what you sell, your experience with preloved fashion..."></textarea>
+                        <div class="form-help">Minimum 100 characters</div>
+                        <div class="form-error" id="businessDescriptionError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="yearsInBusiness">Years in Business</label>
+                        <select id="yearsInBusiness" name="yearsInBusiness">
+                            <option value="">Select</option>
+                            <option value="0">Less than 1 year</option>
+                            <option value="1">1 year</option>
+                            <option value="2">2 years</option>
+                            <option value="3">3 years</option>
+                            <option value="4">4 years</option>
+                            <option value="5">5+ years</option>
+                        </select>
+                        <div class="form-error" id="yearsInBusinessError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="socialMedia">Social Media Links</label>
+                        <textarea id="socialMedia" name="socialMedia" rows="2" 
+                                  placeholder="Facebook, Instagram, TikTok URLs (one per line)"></textarea>
+                        <div class="form-help">Optional but helps with verification</div>
+                        <div class="form-error" id="socialMediaError"></div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 class="form-section-title">Seller Agreement</h3>
+                    
+                    <div class="agreement-box">
+                        <p><strong>By applying to become a seller, you agree to:</strong></p>
+                        <ul>
+                            <li>Provide accurate product descriptions and photos</li>
+                            <li>Maintain good customer service standards</li>
+                            <li>Ship items within 3 business days after payment verification</li>
+                            <li>Accept returns for items not as described</li>
+                            <li>Pay listing fees before publishing items</li>
+                            <li>Comply with all marketplace policies</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="agreeTerms" name="agreeTerms" required>
+                            <span class="checkbox-label">I have read and agree to the <a href="#" class="auth-link">Seller Agreement</a> and <a href="#" class="auth-link">Marketplace Policies</a></span>
+                        </label>
+                        <div class="form-error" id="agreeTermsError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-wrapper">
+                            <input type="checkbox" id="agreeFees" name="agreeFees" required>
+                            <span class="checkbox-label">I understand that listing fees apply (₱99 for 10 listings, ₱249 for 20 listings, ₱499 for 30 listings)</span>
+                        </label>
+                        <div class="form-error" id="agreeFeesError"></div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="window.history.back()">Cancel</button>
+                    <button type="submit" class="btn-primary-large auth-submit" id="submitApplication">
+                        <span class="btn-text">Submit Application</span>
+                        <span class="btn-spinner hidden">
+                            <div class="spinner"></div>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="form-error auth-form-error" id="formError"></div>
+                <div class="form-success auth-form-success hidden" id="formSuccess">
+                    <p>Application submitted successfully! Redirecting...</p>
+                </div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have a seller account? <a href="login.html" class="auth-link">Sign in</a></p>
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                <a href="../index.html" class="auth-link-secondary">Back to homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/core.js"></script>
+    <script src="../js/validators.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth-nav.js"></script>
+    <script>
+        // Seller Application Handler
+        class SellerApplicationManager {
+            constructor() {
+                this.form = document.getElementById('sellerApplicationForm');
+                this.isSubmitting = false;
+                this.init();
+            }
+
+            init() {
+                if (!this.form) return;
+
+                // Prevent duplicate event listeners
+                if (this.form.dataset.listenerAttached === 'true') return;
+                this.form.dataset.listenerAttached = 'true';
+
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                this.setupCharacterCounters();
+            }
+
+            setupCharacterCounters() {
+                const descriptionField = document.getElementById('businessDescription');
+                if (descriptionField) {
+                    const counter = document.createElement('div');
+                    counter.className = 'char-counter';
+                    counter.style.fontSize = '12px';
+                    counter.style.color = '#666';
+                    counter.style.marginTop = '4px';
+                    descriptionField.parentNode.appendChild(counter);
+
+                    descriptionField.addEventListener('input', () => {
+                        const length = descriptionField.value.length;
+                        counter.textContent = `${length} characters`;
+                        if (length < 100) {
+                            counter.style.color = '#e74c3c';
+                        } else {
+                            counter.style.color = '#27ae60';
+                        }
+                    });
+
+                    // Trigger initial count
+                    descriptionField.dispatchEvent(new Event('input'));
+                }
+            }
+
+            clearErrors() {
+                document.querySelectorAll('.form-error').forEach(el => {
+                    el.textContent = '';
+                    el.classList.remove('visible');
+                });
+                document.getElementById('formError').textContent = '';
+                document.getElementById('formSuccess').classList.add('hidden');
+            }
+
+            showError(fieldId, message) {
+                const errorEl = document.getElementById(fieldId);
+                if (errorEl) {
+                    errorEl.textContent = message;
+                    errorEl.classList.add('visible');
+                }
+            }
+
+            showFormError(message) {
+                const errorEl = document.getElementById('formError');
+                if (errorEl) {
+                    errorEl.textContent = message;
+                    errorEl.classList.add('visible');
+                }
+            }
+
+            showFormSuccess(message) {
+                const successEl = document.getElementById('formSuccess');
+                if (successEl) {
+                    const messageEl = successEl.querySelector('p');
+                    if (messageEl) messageEl.textContent = message;
+                    successEl.classList.remove('hidden');
+                }
+            }
+
+            setFormLoading(loading) {
+                const submitBtn = document.getElementById('submitApplication');
+                if (!submitBtn) return;
+
+                const textEl = submitBtn.querySelector('.btn-text');
+                const spinnerEl = submitBtn.querySelector('.btn-spinner');
+
+                if (loading) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.pointerEvents = 'none';
+                    submitBtn.style.opacity = '0.6';
+                    textEl?.classList.add('hidden');
+                    spinnerEl?.classList.remove('hidden');
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.style.pointerEvents = 'auto';
+                    submitBtn.style.opacity = '1';
+                    textEl?.classList.remove('hidden');
+                    spinnerEl?.classList.add('hidden');
+                }
+            }
+
+            validateForm() {
+                this.clearErrors();
+                let isValid = true;
+
+                // Business Name
+                const businessName = document.getElementById('businessName').value.trim();
+                if (!businessName || businessName.length < 2) {
+                    this.showError('businessNameError', 'Business name must be at least 2 characters');
+                    isValid = false;
+                }
+
+                // Business Email
+                const businessEmail = document.getElementById('businessEmail').value.trim();
+                if (!validators.email(businessEmail)) {
+                    this.showError('businessEmailError', 'Please enter a valid email address');
+                    isValid = false;
+                }
+
+                // Business Phone (optional but validate if provided)
+                const businessPhone = document.getElementById('businessPhone').value.trim();
+                if (businessPhone && !/^[0-9]{11}$/.test(businessPhone)) {
+                    this.showError('businessPhoneError', 'Phone must be 11 digits (e.g., 09171234567)');
+                    isValid = false;
+                }
+
+                // Business Description
+                const businessDescription = document.getElementById('businessDescription').value.trim();
+                if (!businessDescription || businessDescription.length < 100) {
+                    this.showError('businessDescriptionError', 'Description must be at least 100 characters');
+                    isValid = false;
+                }
+
+                // Agreement checkboxes
+                if (!document.getElementById('agreeTerms').checked) {
+                    this.showError('agreeTermsError', 'You must agree to the Seller Agreement');
+                    isValid = false;
+                }
+
+                if (!document.getElementById('agreeFees').checked) {
+                    this.showError('agreeFeesError', 'You must agree to the listing fee structure');
+                    isValid = false;
+                }
+
+                return isValid;
+            }
+
+            async handleSubmit(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (this.isSubmitting) return;
+                
+                // Check if user is logged in
+                if (!window.authManager || !window.authManager.isAuthenticated()) {
+                    this.showFormError('Please log in to submit a seller application');
+                    window.authManager?.redirectToLogin('Please log in to apply as a seller');
+                    return;
+                }
+
+                // Validate form
+                if (!this.validateForm()) {
+                    return;
+                }
+
+                this.isSubmitting = true;
+                this.setFormLoading(true);
+
+                try {
+                    // Get form data
+                    const formData = {
+                        businessName: document.getElementById('businessName').value.trim(),
+                        businessEmail: document.getElementById('businessEmail').value.trim(),
+                        businessPhone: document.getElementById('businessPhone').value.trim() || null,
+                        businessAddress: document.getElementById('businessAddress').value.trim() || null,
+                        businessDescription: document.getElementById('businessDescription').value.trim(),
+                        yearsInBusiness: document.getElementById('yearsInBusiness').value || null,
+                        socialMedia: document.getElementById('socialMedia').value.trim() || null,
+                        userId: window.authManager.getCurrentUser().id,
+                        userEmail: window.authManager.getCurrentUser().email,
+                        userName: window.authManager.getCurrentUser().name || ''
+                    };
+
+                    // Submit to Supabase
+                    const { data, error } = await this.submitApplication(formData);
+
+                    if (error) {
+                        throw new Error(error.message || 'Failed to submit application');
+                    }
+
+                    // Update user account type to seller
+                    const users = JSON.parse(localStorage.getItem('rewear_users') || '[]');
+                    const userIndex = users.findIndex(u => u.id === formData.userId);
+                    if (userIndex !== -1) {
+                        users[userIndex].accountType = 'seller';
+                        localStorage.setItem('rewear_users', JSON.stringify(users));
+                        
+                        // Update current user session
+                        const currentUser = window.authManager.getCurrentUser();
+                        if (currentUser) {
+                            currentUser.accountType = 'seller';
+                            localStorage.setItem('rewear_current_user', JSON.stringify(currentUser));
+                            window.authManager.syncUserSession(currentUser);
+                        }
+                    }
+
+                    // Show success message
+                    this.showFormSuccess('Application submitted successfully! Redirecting to your dashboard...');
+
+                    // Redirect after delay
+                    setTimeout(() => {
+                        const prefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+                        window.location.href = prefix + 'dashboard-seller.html';
+                    }, 2000);
+
+                } catch (error) {
+                    console.error('Seller application error:', error);
+                    this.showFormError(error.message || 'An error occurred. Please try again.');
+                } finally {
+                    this.isSubmitting = false;
+                    this.setFormLoading(false);
+                }
+            }
+
+            async submitApplication(formData) {
+                try {
+                    // Prepare social media links as array
+                    let socialMediaLinks = null;
+                    if (formData.socialMedia) {
+                        socialMediaLinks = formData.socialMedia.split('\n')
+                            .map(link => link.trim())
+                            .filter(link => link.length > 0);
+                    }
+
+                    // Insert into seller_applications table
+                    const { data, error } = await db.from('seller_applications').insert({
+                        user_id: formData.userId,
+                        business_name: formData.businessName,
+                        email: formData.businessEmail,
+                        phone: formData.businessPhone,
+                        address: formData.businessAddress,
+                        business_description: formData.businessDescription,
+                        years_in_business: formData.yearsInBusiness ? parseInt(formData.yearsInBusiness) : null,
+                        social_media_links: socialMediaLinks,
+                        status: 'pending',
+                        submitted_at: new Date().toISOString()
+                    }).select();
+
+                    if (error) {
+                        console.error('Supabase insert error:', error);
+                        return { data: null, error };
+                    }
+
+                    // Also create or update seller record
+                    const { error: sellerError } = await db.from('sellers').upsert({
+                        id: formData.userId,
+                        user_id: formData.userId,
+                        business_name: formData.businessName,
+                        email: formData.businessEmail,
+                        phone: formData.businessPhone,
+                        business_description: formData.businessDescription,
+                        verified: false,
+                        created_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'id'
+                    });
+
+                    if (sellerError) {
+                        console.warn('Seller record upsert error:', sellerError);
+                        // Non-fatal, continue
+                    }
+
+                    // Log activity
+                    await db.from('marketplace_activity_logs').insert({
+                        user_id: formData.userId,
+                        user_type: 'seller',
+                        action_type: 'seller_applied',
+                        target_id: formData.userId,
+                        target_type: 'seller',
+                        details: {
+                            business_name: formData.businessName,
+                            email: formData.businessEmail
+                        }
+                    });
+
+                    return { data, error: null };
+
+                } catch (error) {
+                    console.error('Application submission error:', error);
+                    return { data: null, error: { message: error.message } };
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is logged in
+            if (window.authManager && !window.authManager.isAuthenticated()) {
+                window.authManager.redirectToLogin('Please log in to apply as a seller');
+                return;
+            }
+
+            // Initialize application manager
+            window.sellerApplicationManager = new SellerApplicationManager();
+
+            // Check if user is already a seller
+            if (window.authManager && window.authManager.isSeller()) {
+                const userData = JSON.parse(sessionStorage.getItem('rewear_user_data') || '{}');
+                if (userData.isVerified) {
+                    // Already a verified seller, redirect to dashboard
+                    const prefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+                    window.location.href = prefix + 'dashboard-seller.html';
+                } else {
+                    // Seller but not verified yet
+                    showInfo('Application Pending', 'Your seller application is pending admin approval. You will be notified once approved.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

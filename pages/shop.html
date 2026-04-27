@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <div class="announcement-track">
+            <span>✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life ✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life · </span>
+            <span>✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life ✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life · </span>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="../index.html">REWEAR</a>
+            </div>
+            <div class="nav-menu" id="navMenu">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="shop.html" class="nav-link active">Shop</a>
+                <a href="blog.html" class="nav-link">Blog</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <div class="nav-search">
+                    <input type="text" id="navSearchInput" placeholder="Search products..." class="nav-search-input">
+                    <button class="nav-search-btn">🔍</button>
+                </div>
+                <div class="auth-nav" id="authNav">
+                    <a href="login.html" class="nav-link">Login</a>
+                    <button class="btn-primary" onclick="location.href='signup.html'">Sign Up</button>
+                </div>
+                <div class="user-nav hidden" id="userNav">
+                    <div class="wishlist-nav">
+                        <button class="wishlist-nav-btn" onclick="location.href='wishlist.html'">
+                            <span>♡</span>
+                            <span class="wishlist-badge" id="wishlistBadge" style="display: none;">0</span>
+                        </button>
+                    </div>
+                    <span class="user-greeting" id="userGreeting">Welcome!</span>
+                    <button class="btn-primary" id="userDashboardBtn">Dashboard</button>
+                    <button class="btn-secondary" data-action="logout">Logout</button>
+                </div>
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero hero-shop">
+        <div class="hero-background">
+            <img src="../assets/images/hero-trench-editorial.jpg" alt="Verified Preloved Marketplace">
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">✦ Verified Preloved Marketplace</div>
+            <h1 class="hero-title">Find Your Next<br>Favourite Piece</h1>
+            <p class="hero-subtitle">Curated preloved fashion from trusted sellers. Every item tells a story — find the one that fits yours.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <span class="hero-stat-number" id="statListings">—</span>
+                    <span class="hero-stat-label">Active Listings</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number">Verified</span>
+                    <span class="hero-stat-label">Sellers Only</span>
+                </div>
+                <div class="hero-stat">
+                    <span class="hero-stat-number">Preloved</span>
+                    <span class="hero-stat-label">Sustainable Fashion</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Badges -->
+    <section class="trust-badges">
+        <div class="trust-badge">
+            <div class="trust-icon">🛡️</div>
+            <div class="trust-text">
+                <strong>Buyer Protection</strong>
+                <span>Secure transactions</span>
+            </div>
+        </div>
+        <div class="trust-badge">
+            <div class="trust-icon">✓</div>
+            <div class="trust-text">
+                <strong>Authenticated Items</strong>
+                <span>Reviewed by REWEAR</span>
+            </div>
+        </div>
+        <div class="trust-badge">
+            <div class="trust-icon">↩️</div>
+            <div class="trust-text">
+                <strong>Easy Returns</strong>
+                <span>Hassle-free process</span>
+            </div>
+        </div>
+        <div class="trust-badge">
+            <div class="trust-icon">🚚</div>
+            <div class="trust-text">
+                <strong>Nationwide Delivery</strong>
+                <span>Across the Philippines</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-bar">
+                <div class="filter-tabs">
+                    <button class="cat-tab active" data-category="all">All Items <span id="cnt-all"></span></button>
+                    <button class="cat-tab" data-category="shirts">Tops <span id="cnt-shirts"></span></button>
+                    <button class="cat-tab" data-category="pants">Bottoms <span id="cnt-pants"></span></button>
+                    <button class="cat-tab" data-category="jackets">Outerwear <span id="cnt-jackets"></span></button>
+                    <button class="cat-tab" data-category="shoes">Footwear <span id="cnt-shoes"></span></button>
+                    <button class="cat-tab" data-category="accessories">Accessories <span id="cnt-accessories"></span></button>
+                </div>
+                <div class="filter-controls">
+                    <div class="sort-control">
+                        <button class="sort-btn" id="sortBtn">
+                            <span id="sortLabel">Sort</span>
+                            <span>▼</span>
+                        </button>
+                        <select class="sort-select" id="sortSelect">
+                            <option value="default">Default</option>
+                            <option value="newest">Newest First</option>
+                            <option value="price_asc">Price: Low → High</option>
+                            <option value="price_desc">Price: High → Low</option>
+                            <option value="rating">Top Rated</option>
+                            <option value="savings">Best Savings</option>
+                        </select>
+                    </div>
+                    <div class="view-controls">
+                        <button class="view-btn active" id="gridViewBtn">⊞</button>
+                        <button class="view-btn" id="listViewBtn">☰</button>
+                    </div>
+                    <button class="filter-btn" id="filterBtn">
+                        <span>Filters</span>
+                        <span class="filter-count-badge" id="filterCountBadge" style="display: none;">0</span>
+                    </button>
+                </div>
+            </div>
+            <div class="active-filters-bar" id="activeFiltersBar"></div>
+        </div>
+    </section>
+
+    <!-- Featured Banners -->
+    <section class="featured-banners">
+        <div class="container">
+            <div class="banner-grid">
+                <div class="featured-banner" onclick="filterByCategory('jackets')">
+                    <div class="banner-content">
+                        <div class="banner-badge">✦ Just Dropped</div>
+                        <h3 class="banner-title">Preloved<br>Outerwear</h3>
+                        <button class="banner-btn">
+                            Shop Now
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="featured-banner" onclick="filterByCategory('shirts')">
+                    <div class="banner-content">
+                        <div class="banner-badge">✦ Best Sellers</div>
+                        <h3 class="banner-title">Elevated<br>Tops & Shirts</h3>
+                        <button class="banner-btn">
+                            Explore
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Section with Left Sidebar -->
+    <section class="products-section">
+        <div class="container">
+            <div class="shop-layout">
+                <!-- Left Sidebar Filters (Like SHEIN) -->
+                <aside class="shop-sidebar-left">
+                    <div class="filter-header">
+                        <h3 class="filter-title">Filter</h3>
+                        <button class="filter-reset" id="resetFiltersBtn">Clear All</button>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Category</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="all" checked>
+                                <span>All Items</span>
+                                <span class="filter-option-count" id="cnt-all"></span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="shirts">
+                                <span>Tops & Shirts</span>
+                                <span class="filter-option-count" id="cnt-shirts"></span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="pants">
+                                <span>Pants & Jeans</span>
+                                <span class="filter-option-count" id="cnt-pants"></span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="jackets">
+                                <span>Jackets & Coats</span>
+                                <span class="filter-option-count" id="cnt-jackets"></span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="shoes">
+                                <span>Shoes</span>
+                                <span class="filter-option-count" id="cnt-shoes"></span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="category" value="accessories">
+                                <span>Accessories</span>
+                                <span class="filter-option-count" id="cnt-accessories"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Price Range Filter -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Price Range</h4>
+                        <div class="price-range-inputs">
+                            <input type="number" id="priceMin" placeholder="Min" class="price-input">
+                            <span class="price-separator">—</span>
+                            <input type="number" id="priceMax" placeholder="Max" class="price-input">
+                        </div>
+                    </div>
+
+                    <!-- Size Filter -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Size</h4>
+                        <div class="size-filter-grid">
+                            <button class="size-filter-btn" data-size="XS">XS</button>
+                            <button class="size-filter-btn" data-size="S">S</button>
+                            <button class="size-filter-btn" data-size="M">M</button>
+                            <button class="size-filter-btn" data-size="L">L</button>
+                            <button class="size-filter-btn" data-size="XL">XL</button>
+                            <button class="size-filter-btn" data-size="XXL">XXL</button>
+                            <button class="size-filter-btn" data-size="One Size">One Size</button>
+                        </div>
+                    </div>
+
+                    <!-- Condition Filter -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Condition</h4>
+                        <div class="condition-pills">
+                            <button class="condition-pill" data-condition="new">Brand New</button>
+                            <button class="condition-pill" data-condition="like-new">Like New</button>
+                            <button class="condition-pill" data-condition="excellent">Excellent</button>
+                            <button class="condition-pill" data-condition="good">Good</button>
+                            <button class="condition-pill" data-condition="fair">Fair</button>
+                        </div>
+                    </div>
+
+                </aside>
+
+                <!-- Main Content Area -->
+                <div class="shop-main">
+                    <div class="products-header">
+                        <div class="products-title">
+                            <h2 id="gridTitle">All Listings</h2>
+                            <p id="gridSubtitle">Curated preloved pieces from verified sellers</p>
+                        </div>
+                        <div class="products-results">
+                            <span class="results-chip" id="resultsChip"></span>
+                            <div class="mobile-search">
+                                <input type="text" id="mobileSearchInput" placeholder="Search products..." class="mobile-search-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded here -->
+                    </div>
+                    <div class="load-more-wrap" id="loadMoreWrap" style="display: none;">
+                        <button class="load-more-btn" id="loadMoreBtn">
+                            Load More
+                            <span>↓</span>
+                        </button>
+                        <p class="load-more-progress" id="loadMoreProgress"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Section -->
+    <section class="community-section">
+        <div class="container">
+            <div class="community-icon">◆</div>
+            <h2 class="community-title">Wear it. Love it.<br>Pass it on.</h2>
+            <p class="community-text">Join thousands who shop and sell preloved fashion on REWEAR. Every piece finds a new home. Share your looks with #REWEARStyle</p>
+            <button class="btn-primary-large" onclick="location.href='dashboard-seller.html'">Sell Your Pieces</button>
+        </div>
+        <div class="community-gallery">
+            <div class="gallery-track">
+                <div class="gallery-item"><img src="../assets/images/studio-white.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/textured-knitted-shirt.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/editorial-blazer.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/sharp-tailored-blazer.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/hero-moody-studio.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/leather-bomber-jacket.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/denim-overalls.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/ribbed-knit-midi-dress.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/oversized-hoodie.jpg" alt="Community member"></div>
+                <!-- Duplicate for seamless infinite loop -->
+                <div class="gallery-item"><img src="../assets/images/studio-white.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/textured-knitted-shirt.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/editorial-blazer.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/sharp-tailored-blazer.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/hero-moody-studio.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/leather-bomber-jacket.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/denim-overalls.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/ribbed-knit-midi-dress.jpg" alt="Community member"></div>
+                <div class="gallery-item"><img src="../assets/images/oversized-hoodie.jpg" alt="Community member"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="newsletter-section">
+        <div class="container">
+            <div class="newsletter-content">
+                <h2 class="newsletter-title">Get new drops<br>in your inbox</h2>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Enter your email" class="newsletter-input">
+                    <button class="btn-white-pill">Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col footer-brand">
+                    <h3>REWEAR</h3>
+                    <p>Preloved fashion marketplace connecting conscious buyers and sellers across the Philippines.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link">Instagram</a>
+                        <a href="#" class="social-link">TikTok</a>
+                        <a href="#" class="social-link">Facebook</a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="../index.html">Home</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Sell on REWEAR</h4>
+                    <ul class="footer-links">
+                        <li><a href="dashboard-seller.html">Seller Dashboard</a></li>
+                        <li><a href="#" onclick="showModal({type:'success', title:'Coming Soon', message:'Seller guides are being prepared.'})">How to Sell</a></li>
+                        <li><a href="#" onclick="showModal({type:'success', title:'Coming Soon', message:'Listing guidelines will be available soon.'})">Listing Guidelines</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Get in touch</h4>
+                    <ul class="footer-links">
+                        <li><a href="mailto:hello@rewear.ph">hello@rewear.ph</a></li>
+                        <li>Manila, Philippines</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-wordmark">
+                <h2>REWEAR</h2>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Filter Drawer -->
+    <div class="filter-overlay" id="filterOverlay"></div>
+    <div class="filter-drawer" id="filterDrawer">
+        <div class="drawer-header">
+            <h3>Filters</h3>
+            <button class="drawer-close" id="drawerClose">✕</button>
+        </div>
+        <div class="drawer-content">
+            <div class="filter-group">
+                <h4>Condition</h4>
+                <div class="filter-chips" id="conditionChips">
+                    <button class="f-chip" data-condition="like-new">Like New</button>
+                    <button class="f-chip" data-condition="good">Good</button>
+                    <button class="f-chip" data-condition="fair">Fair</button>
+                    <button class="f-chip" data-condition="preloved">Preloved</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <h4>Price Range (₱)</h4>
+                <div class="price-inputs">
+                    <input type="number" id="priceMin" placeholder="Min" class="price-input">
+                    <span>—</span>
+                    <input type="number" id="priceMax" placeholder="Max" class="price-input">
+                </div>
+            </div>
+            <div class="filter-group">
+                <h4>Size</h4>
+                <div class="filter-chips" id="sizeChips">
+                    <button class="f-chip" data-size="XS">XS</button>
+                    <button class="f-chip" data-size="S">S</button>
+                    <button class="f-chip" data-size="M">M</button>
+                    <button class="f-chip" data-size="L">L</button>
+                    <button class="f-chip" data-size="XL">XL</button>
+                    <button class="f-chip" data-size="One Size">One Size</button>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-footer">
+            <button class="btn-secondary" id="resetFiltersBtn">Clear All Filters</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../api/supabase.js"></script>
+    <script src="../js/path-helper.js"></script>
+    <script src="../js/skeleton-loader.js"></script>
+    <script src="../js/core.js"></script>
+    <script src="../js/validators.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth-nav.js"></script>
+    <script src="../js/shop.js"></script>
+</body>
+</html>

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist — REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-body">
+    <aside class="dash-sidebar">
+        <div class="dash-logo">
+            <a href="../index.html">REWEAR</a>
+        </div>
+        <nav class="dash-nav">
+            <a href="wishlist.html" class="dash-nav-link active">My Wishlist</a>
+            <a href="dashboard-buyer.html" class="dash-nav-link">My Account</a>
+            <a href="shop.html" class="dash-nav-link">Continue Shopping</a>
+        </nav>
+        <div class="dash-sidebar-footer">
+            <span class="dash-badge dash-badge-verified">Buyer</span>
+            <a href="shop.html" class="dash-back-link">Back to Shop</a>
+        </div>
+    </aside>
+
+    <main class="dash-main">
+        <header class="dash-header">
+            <div>
+                <h1 class="dash-page-title">My Wishlist</h1>
+                <p class="dash-page-sub">Items you've saved for later</p>
+            </div>
+            <div class="wishlist-header-actions">
+                <span class="wishlist-count" id="wishlistCount">0 items</span>
+                <button class="btn-secondary" id="clearWishlistBtn" style="display: none;">Clear All</button>
+            </div>
+        </header>
+
+        <!-- Wishlist Content -->
+        <div class="wishlist-content">
+            <!-- Empty State -->
+            <div class="wishlist-empty" id="wishlistEmpty">
+                <div class="empty-state">
+                    <span class="empty-state-icon">♡</span>
+                    <h3>Your wishlist is empty</h3>
+                    <p>Save items you love to your wishlist and shop them later.</p>
+                    <button class="btn-primary-large" onclick="location.href='shop.html'">Start Shopping</button>
+                </div>
+            </div>
+
+            <!-- Wishlist Grid -->
+            <div class="wishlist-grid" id="wishlistGrid" style="display: none;">
+                <!-- Wishlist items will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../api/supabase.js"></script>`n    <script src="../js/path-helper.js"></script>
+    <script src="../js/core.js"></script>
+    <script src="../js/validators.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth-nav.js"></script>
+    <script>
+        // ---- WISHLIST MANAGEMENT ----
+        let wishlist = JSON.parse(localStorage.getItem('rewear-wishlist') || '[]');
+        let allProducts = [];
+
+        function saveWishlist() {
+            localStorage.setItem('rewear-wishlist', JSON.stringify(wishlist));
+            updateWishlistCount();
+        }
+
+        function updateWishlistCount() {
+            const countEl = document.getElementById('wishlistCount');
+            const clearBtn = document.getElementById('clearWishlistBtn');
+            
+            if (countEl) {
+                countEl.textContent = `${wishlist.length} item${wishlist.length !== 1 ? 's' : ''}`;
+            }
+            
+            if (clearBtn) {
+                clearBtn.style.display = wishlist.length > 0 ? 'block' : 'none';
+            }
+        }
+
+        function removeFromWishlist(productId) {
+            wishlist = wishlist.filter(id => id !== productId);
+            saveWishlist();
+            renderWishlist();
+            
+            if (typeof showSuccess === 'function') {
+                showSuccess('Removed from Wishlist', 'Item removed from your wishlist.');
+            }
+        }
+
+        function clearAllWishlist() {
+            if (wishlist.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear your entire wishlist?')) {
+                wishlist = [];
+                saveWishlist();
+                renderWishlist();
+                
+                if (typeof showSuccess === 'function') {
+                    showSuccess('Wishlist Cleared', 'All items removed from your wishlist.');
+                }
+            }
+        }
+
+        function formatPHP(price) {
+            return `₱${price.toLocaleString()}`;
+        }
+
+        function escapeHtml(str) {
+            const d = document.createElement('div');
+            d.textContent = str || '';
+            return d.innerHTML;
+        }
+
+        function wishlistItemHTML(product) {
+            const savings = product.suggested_price && product.price < product.suggested_price ? 
+                product.suggested_price - product.price : 0;
+            const savePct = product.suggested_price ? 
+                Math.round((savings / product.suggested_price) * 100) : 0;
+
+            return `
+                <div class="wishlist-item" data-id="${product.id}">
+                    <div class="wishlist-item-image">
+                        <img src="${product.image_url || 'assets/images/studio-white.jpg'}" 
+                             alt="${escapeHtml(product.name)}" loading="lazy">
+                        <button type="button" class="wishlist-remove-btn" 
+                                onclick="removeFromWishlist('${product.id}')" 
+                                aria-label="Remove from wishlist">✕</button>
+                    </div>
+                    <div class="wishlist-item-info">
+                        <div class="wishlist-item-category">${product.category || 'REWEAR'}</div>
+                        <h3 class="wishlist-item-name">${escapeHtml(product.name)}</h3>
+                        <div class="wishlist-item-price">
+                            <span class="current-price">${formatPHP(product.price)}</span>
+                            ${product.suggested_price ? 
+                                `<span class="original-price">${formatPHP(product.suggested_price)}</span>` : ''}
+                            ${savePct >= 10 ? 
+                                `<span class="save-badge">-${savePct}%</span>` : ''}
+                        </div>
+                        <div class="wishlist-item-actions">
+                            <button class="btn-primary" onclick="location.href='product.html?id=${product.id}'">
+                                View Details
+                            </button>
+                            <button class="btn-secondary" onclick="removeFromWishlist('${product.id}')">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+        }
+
+        async function loadProducts() {
+            try {
+                const { data, error } = await db.from('products')
+                    .select('*')
+                    .eq('in_stock', true);
+                
+                if (error) {
+                    console.error('[wishlist.html] loadProducts:', error.message);
+                    allProducts = getDemoProducts();
+                    return;
+                }
+                
+                allProducts = data && data.length ? data : getDemoProducts();
+            } catch (err) {
+                console.error('[wishlist.html] loadProducts exception:', err);
+                allProducts = getDemoProducts();
+            }
+        }
+
+        function getDemoProducts() {
+            return [
+                { 
+                    id:'demo-1', 
+                    name:'Classic Denim Jacket', 
+                    price:850, 
+                    suggested_price:1500, 
+                    category:'jackets', 
+                    image_url:'assets/images/leather-bomber-jacket.jpg', 
+                    in_stock:true 
+                },
+                { 
+                    id:'demo-2', 
+                    name:'Premium Cotton Shirt', 
+                    price:480, 
+                    suggested_price:900, 
+                    category:'shirts', 
+                    image_url:'assets/images/textured-knitted-shirt.jpg', 
+                    in_stock:true 
+                },
+                { 
+                    id:'demo-3', 
+                    name:'Tailored Trousers', 
+                    price:650, 
+                    suggested_price:1200, 
+                    category:'pants', 
+                    image_url:'assets/images/sharp-tailored-blazer.jpg', 
+                    in_stock:true 
+                },
+                { 
+                    id:'demo-4', 
+                    name:'Leather Messenger Bag', 
+                    price:1100, 
+                    suggested_price:2200, 
+                    category:'accessories', 
+                    image_url:'assets/images/studio-white.jpg', 
+                    in_stock:true 
+                },
+                { 
+                    id:'demo-5', 
+                    name:'Oversized Hoodie', 
+                    price:550, 
+                    suggested_price:1100, 
+                    category:'shirts', 
+                    image_url:'assets/images/oversized-hoodie.jpg', 
+                    in_stock:true 
+                }
+            ];
+        }
+
+        function renderWishlist() {
+            const emptyState = document.getElementById('wishlistEmpty');
+            const grid = document.getElementById('wishlistGrid');
+            
+            if (wishlist.length === 0) {
+                emptyState.style.display = 'block';
+                grid.style.display = 'none';
+                return;
+            }
+            
+            // Get products that are in the wishlist
+            const wishlistProducts = allProducts.filter(product => 
+                wishlist.includes(product.id)
+            );
+            
+            if (wishlistProducts.length === 0) {
+                // Products not found in database, show empty state
+                emptyState.style.display = 'block';
+                grid.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            grid.style.display = 'grid';
+            grid.innerHTML = wishlistProducts.map(product => wishlistItemHTML(product)).join('');
+        }
+
+        // ---- EVENT LISTENERS ----
+        document.getElementById('clearWishlistBtn').addEventListener('click', clearAllWishlist);
+
+        // ---- INITIALIZATION ----
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication
+            if (window.authManager && !window.authManager.isAuthenticated()) {
+                window.authManager.redirectToLogin('Please log in to view your wishlist.');
+                return;
+            }
+            
+            updateWishlistCount();
+            await loadProducts();
+            renderWishlist();
+        });
+    </script>
+
+    <style>
+        /* Wishlist-specific styles */
+        .wishlist-content {
+            padding: 0;
+        }
+
+        .wishlist-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .wishlist-count {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .wishlist-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+            padding: 24px 0;
+        }
+
+        .wishlist-item {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .wishlist-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .wishlist-item-image {
+            position: relative;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+        }
+
+        .wishlist-item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .wishlist-item:hover .wishlist-item-image img {
+            transform: scale(1.05);
+        }
+
+        .wishlist-remove-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .wishlist-remove-btn:hover {
+            background: #ff4757;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .wishlist-item-info {
+            padding: 20px;
+        }
+
+        .wishlist-item-category {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .wishlist-item-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin: 0 0 12px 0;
+            line-height: 1.3;
+        }
+
+        .wishlist-item-price {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .current-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .original-price {
+            font-size: 16px;
+            color: #999;
+            text-decoration: line-through;
+        }
+
+        .save-badge {
+            background: #27ae60;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .wishlist-item-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .wishlist-item-actions .btn-primary,
+        .wishlist-item-actions .btn-secondary {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        /* Empty state */
+        .wishlist-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+        }
+
+        .empty-state {
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: #ddd;
+            display: block;
+            margin-bottom: 24px;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            color: #333;
+            margin: 0 0 12px 0;
+        }
+
+        .empty-state p {
+            color: #666;
+            margin: 0 0 24px 0;
+            line-height: 1.5;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .wishlist-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .wishlist-header-actions {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+        }
+    </style>
+</body>
+</html>

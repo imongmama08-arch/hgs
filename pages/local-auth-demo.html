@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Auth Demo — REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .demo-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .demo-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+        }
+        .demo-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .user-list {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+        }
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-small {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .current-user {
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        .status-online { background: #28a745; }
+        .status-offline { background: #6c757d; }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1>Local Authentication Demo</h1>
+        <p>This page demonstrates the local storage-based authentication system. No Supabase auth required!</p>
+
+        <div class="demo-section">
+            <h3>Current Authentication Status</h3>
+            <div id="authStatus">
+                <span class="status-indicator status-offline"></span>
+                <span>Not logged in</span>
+            </div>
+            <div id="currentUserInfo" style="margin-top: 1rem; display: none;">
+                <strong>Logged in as:</strong>
+                <div id="userDetails"></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>Quick Actions</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button onclick="location.href='signup.html'" class="btn-primary">Sign Up</button>
+                <button onclick="location.href='login.html'" class="btn-primary">Login</button>
+                <button onclick="logout()" class="btn-secondary" id="logoutBtn" style="display: none;">Logout</button>
+                <button onclick="clearAllData()" class="btn-danger">Clear All Data</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>All Registered Users</h3>
+            <p>These users are stored in localStorage (browser storage only):</p>
+            <div id="usersList">
+                <p>No users registered yet.</p>
+            </div>
+            <button onclick="refreshUsersList()" class="btn-secondary">Refresh List</button>
+        </div>
+
+        <div class="demo-section">
+            <h3>Test Accounts</h3>
+            <p>You can create these test accounts or use the signup form:</p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button onclick="createTestUser('buyer')" class="btn-secondary">Create Test Buyer</button>
+                <button onclick="createTestUser('seller')" class="btn-secondary">Create Test Seller</button>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h3>How It Works</h3>
+            <ul>
+                <li><strong>Local Storage:</strong> User accounts are stored in your browser's localStorage</li>
+                <li><strong>No Email Verification:</strong> Users can login immediately after signup</li>
+                <li><strong>No Database:</strong> Everything is stored locally in the browser</li>
+                <li><strong>Session Management:</strong> Login state persists across browser sessions</li>
+                <li><strong>Password Storage:</strong> Passwords are stored in plain text (demo only - use hashing in production)</li>
+                <li><strong>Completely Offline:</strong> No internet connection required for authentication</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h3>Navigation</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="../index.html" class="btn-secondary">Home</a>
+                <a href="dashboard-buyer.html" class="btn-secondary">Buyer Dashboard</a>
+                <a href="dashboard-seller.html" class="btn-secondary">Seller Dashboard</a>
+                <a href="shop.html" class="btn-secondary">Shop</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/core.js"></script>
+    <script src="../js/validators.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script>
+        // Demo functions
+        function updateAuthStatus() {
+            const authStatus = document.getElementById('authStatus');
+            const currentUserInfo = document.getElementById('currentUserInfo');
+            const userDetails = document.getElementById('userDetails');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (window.authManager && window.authManager.isAuthenticated()) {
+                const user = window.authManager.getCurrentUser();
+                authStatus.innerHTML = '<span class="status-indicator status-online"></span><span>Logged in</span>';
+                currentUserInfo.style.display = 'block';
+                userDetails.innerHTML = `
+                    <div><strong>Email:</strong> ${user.email}</div>
+                    <div><strong>Name:</strong> ${user.name}</div>
+                    <div><strong>Account Type:</strong> ${user.accountType}</div>
+                    <div><strong>User ID:</strong> ${user.id}</div>
+                `;
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                authStatus.innerHTML = '<span class="status-indicator status-offline"></span><span>Not logged in</span>';
+                currentUserInfo.style.display = 'none';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        function refreshUsersList() {
+            const usersList = document.getElementById('usersList');
+            
+            if (!window.authManager) {
+                usersList.innerHTML = '<p>Auth manager not loaded yet...</p>';
+                return;
+            }
+
+            const users = window.authManager.getAllUsers();
+            const currentUser = window.authManager.getCurrentUser();
+
+            if (users.length === 0) {
+                usersList.innerHTML = '<p>No users registered yet.</p>';
+                return;
+            }
+
+            const usersHtml = users.map(user => {
+                const isCurrentUser = currentUser && currentUser.id === user.id;
+                return `
+                    <div class="user-item ${isCurrentUser ? 'current-user' : ''}">
+                        <div class="user-info">
+                            <strong>${user.name || 'No name'}</strong> (${user.email})
+                            <br>
+                            <small>Type: ${user.accountType} | Created: ${new Date(user.createdAt).toLocaleDateString()}</small>
+                            ${isCurrentUser ? '<br><small><strong>← Currently logged in</strong></small>' : ''}
+                        </div>
+                        <div class="user-actions">
+                            ${!isCurrentUser ? `<button onclick="deleteUser('${user.id}')" class="btn-small btn-danger">Delete</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            usersList.innerHTML = `<div class="user-list">${usersHtml}</div>`;
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                if (window.authManager.deleteUser(userId)) {
+                    refreshUsersList();
+                    showSuccess('User deleted successfully');
+                } else {
+                    showError('Failed to delete user');
+                }
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('This will delete ALL user accounts and logout. Are you sure?')) {
+                localStorage.removeItem('rewear_users');
+                localStorage.removeItem('rewear_current_user');
+                sessionStorage.clear();
+                location.reload();
+            }
+        }
+
+        async function createTestUser(type) {
+            const timestamp = Date.now();
+            const email = `test${type}${timestamp}@example.com`;
+            const name = `Test ${type.charAt(0).toUpperCase() + type.slice(1)}`;
+            
+            const { data, error } = await window.authManager.signUp(email, 'password123', {
+                name: name,
+                accountType: type
+            });
+
+            if (error) {
+                showError('Failed to create test user: ' + error.message);
+            } else {
+                showSuccess(`Test ${type} created: ${email}`);
+                refreshUsersList();
+                updateAuthStatus();
+            }
+        }
+
+        function showSuccess(message) {
+            alert('✓ ' + message);
+        }
+
+        function showError(message) {
+            alert('✗ ' + message);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthStatus();
+            refreshUsersList();
+            
+            // Refresh status every 2 seconds
+            setInterval(() => {
+                updateAuthStatus();
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

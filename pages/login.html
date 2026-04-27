@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login — REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <a href="../index.html">REWEAR</a>
+                </div>
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to your account</p>
+            </div>
+
+            <form class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" name="email" required 
+                           placeholder="Enter your email" autocomplete="email">
+                    <div class="form-error" id="emailError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="password-input-wrapper">
+                        <input type="password" id="loginPassword" name="password" required 
+                               placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="password-toggle" id="passwordToggle" aria-label="Show password">
+                            <span class="password-toggle-icon">👁</span>
+                        </button>
+                    </div>
+                    <div class="form-error" id="passwordError"></div>
+                </div>
+
+                <div class="auth-options">
+                    <label class="checkbox-wrapper">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkbox-label">Remember me</span>
+                    </label>
+                    <a href="forgot-password.html" class="auth-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary-large auth-submit" id="loginSubmit">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-spinner hidden">
+                        <div class="spinner"></div>
+                    </span>
+                </button>
+
+                <div class="form-error auth-form-error" id="formError"></div>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="signup.html" class="auth-link">Sign up</a></p>
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                <a href="../index.html" class="auth-link-secondary">Continue as guest</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/core.js"></script>
+    <script src="../js/validators.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth-nav.js"></script>
+    <script>
+        // Debug function to check auth state
+        window.debugAuth = function() {
+            console.log('=== AUTH DEBUG INFO ===');
+            console.log('Current user:', window.authManager?.getCurrentUser());
+            console.log('Is authenticated:', window.authManager?.isAuthenticated());
+            console.log('User type:', window.authManager?.getUserType());
+            console.log('Session storage:', {
+                current_user: localStorage.getItem('rewear_current_user'),
+                user_type: sessionStorage.getItem('rewear_user_type'),
+                seller_id: sessionStorage.getItem('rewear_seller_id'),
+                user_id: sessionStorage.getItem('rewear_user_id')
+            });
+            console.log('All users:', window.authManager?.getAllUsers());
+            console.log('========================');
+        };
+
+        // Clear all auth data function
+        window.clearAuthData = function() {
+            console.log('Clearing all authentication data...');
+            localStorage.removeItem('rewear_current_user');
+            localStorage.removeItem('rewear_users');
+            localStorage.removeItem('rewear_remember_me');
+            sessionStorage.clear();
+            console.log('Auth data cleared. Please refresh and try logging in again.');
+        };
+
+        // Create test user function
+        window.createTestUser = function() {
+            console.log('Creating test user...');
+            const testUser = {
+                id: 'test-user-12345',
+                email: 'test@example.com',
+                password: 'password123',
+                name: 'Test User',
+                accountType: 'buyer',
+                verified: true,
+                createdAt: new Date().toISOString()
+            };
+            
+            const users = JSON.parse(localStorage.getItem('rewear_users') || '[]');
+            const existingIndex = users.findIndex(u => u.email === testUser.email);
+            
+            if (existingIndex !== -1) {
+                users[existingIndex] = testUser;
+                console.log('Updated existing test user');
+            } else {
+                users.push(testUser);
+                console.log('Created new test user');
+            }
+            
+            localStorage.setItem('rewear_users', JSON.stringify(users));
+            console.log('Test user created: email=test@example.com, password=password123');
+            
+            // Reload auth manager
+            if (window.authManager) {
+                window.authManager.users = window.authManager.loadUsers();
+            }
+        };
+
+        // Initialize login page
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.authManager) {
+                window.authManager.initLoginPage();
+            }
+            
+            // Auto-debug on login page
+            setTimeout(() => {
+                if (window.debugAuth) {
+                    console.log('Auto-debugging auth state on login page...');
+                    window.debugAuth();
+                    
+                    // Create test user if no users exist
+                    const users = window.authManager?.getAllUsers() || [];
+                    if (users.length === 0) {
+                        console.log('No users found, creating test user...');
+                        window.createTestUser();
+                    }
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

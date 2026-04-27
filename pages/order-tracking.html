@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Tracking - REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="dashboard-body">
+    <div class="tracking-container">
+        <div class="tracking-header">
+            <h1>Track Your Order</h1>
+            <p>Enter your order reference to check status</p>
+        </div>
+
+        <div class="tracking-search">
+            <div class="form-group">
+                <label>Order Reference</label>
+                <input type="text" id="orderReference" placeholder="RWL-123456" maxlength="10">
+            </div>
+            <button type="button" class="btn-primary-large" onclick="trackOrder()">Track Order</button>
+        </div>
+
+        <div class="tracking-results" id="trackingResults" style="display: none;">
+            <div class="order-info" id="orderInfo"></div>
+            <div class="tracking-timeline" id="trackingTimeline"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../api/supabase.js"></script>
+    <script src="../js/path-helper.js"></script>
+    <script src="../js/core.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script src="../js/order-tracking.js"></script>
+</body>
+</html>

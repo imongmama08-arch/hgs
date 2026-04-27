@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/admin-messaging.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- PIN GATE — shown until admin logs in -->
+    <div id="adminGate" class="admin-gate">
+        <div class="admin-gate-card">
+            <div class="admin-gate-logo">REWEAR</div>
+            <h2 class="admin-gate-title">Admin Access</h2>
+            <p class="admin-gate-sub">Enter your admin PIN to continue</p>
+            <div class="admin-pin-inputs" id="pinInputs">
+                <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+                <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+                <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+                <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+            </div>
+            <p class="admin-pin-error hidden" id="pinError">Incorrect PIN. Try again.</p>
+            <button class="btn-primary-large" id="pinSubmitBtn" style="width:100%;margin-top:8px">Enter</button>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD — hidden until PIN verified -->
+    <div id="adminDashboard" class="hidden">
+
+        <aside class="dash-sidebar">
+            <div class="dash-logo"><a href="../index.html">REWEAR</a></div>
+            <div class="dash-sidebar-badge">
+                <span class="dash-badge dash-badge-verified">Admin</span>
+            </div>
+            <nav class="dash-nav">
+                <a href="#" class="dash-nav-link active" data-tab="overview">▦ Overview</a>
+                <a href="#" class="dash-nav-link" data-tab="sellers">👤 Seller Applications</a>
+                <a href="#" class="dash-nav-link" data-tab="fees">💳 Listing Fees</a>
+                <a href="#" class="dash-nav-link" data-tab="payments">✅ Payment Proofs</a>
+                <a href="#" class="dash-nav-link" data-tab="listings">📦 Moderate Listings</a>
+                <a href="#" class="dash-nav-link" data-tab="transactions">💰 Transactions</a>
+                <a href="#" class="dash-nav-link" data-tab="orders">📋 All Orders</a>
+                <a href="#" class="dash-nav-link" data-tab="users">👥 Manage Users</a>
+                <a href="#" class="dash-nav-link" data-tab="messaging">💬 Buyer-Seller Messages</a>
+                <a href="#" class="dash-nav-link" data-tab="reports">📊 Reports</a>
+            </nav>
+            <div class="dash-sidebar-footer">
+                <button class="dash-back-link" id="adminLogoutBtn" style="background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.4);font-size:13px;text-align:left;">⬡ Logout</button>
+                <a href="shop.html" class="dash-back-link">← Back to Shop</a>
+            </div>
+        </aside>
+
+        <main class="dash-main">
+            <header class="dash-header">
+                <div>
+                    <h1 class="dash-page-title" id="dashPageTitle">Overview</h1>
+                    <p class="dash-page-sub">REWEAR Admin Panel</p>
+                </div>
+                <div class="dash-header-actions">
+                    <span class="dash-badge dash-badge-verified" id="adminClock"></span>
+                </div>
+            </header>
+
+            <!-- TAB: Overview -->
+            <div class="dash-tab active" id="tab-overview">
+                <div class="dash-stats-grid">
+                    <div class="dash-stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-tab=sellers]').click()">
+                        <p class="dash-stat-label">Pending Sellers</p>
+                        <h2 class="dash-stat-number" id="statPendingSellers">—</h2>
+                    </div>
+                    <div class="dash-stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-tab=fees]').click()">
+                        <p class="dash-stat-label">Pending Fees</p>
+                        <h2 class="dash-stat-number" id="statPendingFees">—</h2>
+                    </div>
+                    <div class="dash-stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-tab=payments]').click()">
+                        <p class="dash-stat-label">Pending Payments</p>
+                        <h2 class="dash-stat-number" id="statPendingPayments">—</h2>
+                    </div>
+                    <div class="dash-stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-tab=listings]').click()">
+                        <p class="dash-stat-label">Pending Listings</p>
+                        <h2 class="dash-stat-number" id="statPendingListings">—</h2>
+                    </div>
+                    <div class="dash-stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-tab=orders]').click()">
+                        <p class="dash-stat-label">Total Orders</p>
+                        <h2 class="dash-stat-number" id="statTotalOrders">—</h2>
+                    </div>
+                    <div class="dash-stat-card" style="cursor:pointer;" onclick="document.querySelector('[data-tab=transactions]').click()">
+                        <p class="dash-stat-label">Pending Payouts</p>
+                        <h2 class="dash-stat-number" id="statPendingPayouts">—</h2>
+                    </div>
+                </div>
+
+                <!-- Flow Quick Actions -->
+                <div class="dash-section-card" style="margin-bottom:20px;">
+                    <h3 class="dash-section-title">Admin Flow</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px;">
+                        <button onclick="document.querySelector('[data-tab=sellers]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">👤</div>
+                            <div style="font-weight:600;font-size:13px;">Seller Applications</div>
+                            <div style="font-size:11px;color:#888;">Approve / Reject</div>
+                        </button>
+                        <button onclick="document.querySelector('[data-tab=fees]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">💳</div>
+                            <div style="font-weight:600;font-size:13px;">Listing Fees</div>
+                            <div style="font-size:11px;color:#888;">Verify / Reject</div>
+                        </button>
+                        <button onclick="document.querySelector('[data-tab=payments]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">✅</div>
+                            <div style="font-weight:600;font-size:13px;">Payment Proofs</div>
+                            <div style="font-size:11px;color:#888;">Verify / Reject</div>
+                        </button>
+                        <button onclick="document.querySelector('[data-tab=listings]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">📦</div>
+                            <div style="font-weight:600;font-size:13px;">Moderate Listings</div>
+                            <div style="font-size:11px;color:#888;">Approve / Remove</div>
+                        </button>
+                        <button onclick="document.querySelector('[data-tab=transactions]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">💰</div>
+                            <div style="font-weight:600;font-size:13px;">Transactions</div>
+                            <div style="font-size:11px;color:#888;">Release Payouts</div>
+                        </button>
+                        <button onclick="document.querySelector('[data-tab=users]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">👥</div>
+                            <div style="font-weight:600;font-size:13px;">Manage Users</div>
+                            <div style="font-size:11px;color:#888;">View / Suspend</div>
+                        </button>
+                        <button onclick="document.querySelector('[data-tab=reports]').click()" style="padding:14px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:20px;margin-bottom:4px;">📊</div>
+                            <div style="font-weight:600;font-size:13px;">Reports</div>
+                            <div style="font-size:11px;color:#888;">Generate / Export</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dash-section-card">
+                    <h3 class="dash-section-title">Needs Attention</h3>
+                    <div id="attentionList"><p class="dash-empty">Loading…</p></div>
+                </div>
+            </div>
+
+            <!-- TAB: Seller Applications -->
+            <div class="dash-tab" id="tab-sellers">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="sellerStatusFilter">
+                        <option value="all" selected>All Applications</option>
+                        <option value="pending">Pending Review</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                    <input type="text" class="dash-search" id="sellerSearch" placeholder="Search by business name or email…">
+                </div>
+                <div class="admin-cards-list" id="sellersList">
+                    <p class="dash-empty">Loading seller applications…</p>
+                </div>
+            </div>
+
+            <!-- TAB: Listing Fees -->
+            <div id="tab-fees" class="dash-tab">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="feeStatusFilter">
+                        <option value="pending">Pending Verification</option>
+                        <option value="active">Active</option>
+                        <option value="all">All</option>
+                    </select>
+                    <input type="text" class="dash-search" id="feeSearch" placeholder="Search by seller name…">
+                </div>
+                <div id="feesList"><p class="dash-empty">Loading…</p></div>
+            </div>
+
+            <!-- TAB: Payment Proofs -->
+            <div class="dash-tab" id="tab-payments">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="paymentStatusFilter">
+                        <option value="submitted">Proof Submitted (Needs Review)</option>
+                        <option value="verified">Verified</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All Orders</option>
+                    </select>
+                    <input type="text" class="dash-search" id="paymentSearch" placeholder="Search by buyer name or email…">
+                </div>
+                <div class="admin-cards-list" id="paymentsList">
+                    <p class="dash-empty">Loading payment verifications…</p>
+                </div>
+            </div>
+
+            <!-- TAB: Moderate Listings -->
+            <div class="dash-tab" id="tab-listings">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="listingStatusFilter">
+                        <option value="pending" selected>Pending Approval</option>
+                        <option value="approved">Live / Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="all">All Listings</option>
+                    </select>
+                    <input type="text" class="dash-search" id="listingSearch" placeholder="Search listings…">
+                </div>
+                <div class="admin-cards-list" id="listingsList">
+                    <p class="dash-empty">Loading listings…</p>
+                </div>
+            </div>
+
+            <!-- TAB: Transactions -->
+            <div id="tab-transactions" class="dash-tab">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="transactionStatusFilter">
+                        <option value="pending">Pending Payout</option>
+                        <option value="released">Released</option>
+                        <option value="all">All</option>
+                    </select>
+                    <input type="text" class="dash-search" id="transactionSearch" placeholder="Search by seller or buyer…">
+                </div>
+                <div id="transactionsList"><p class="dash-empty">Loading…</p></div>
+            </div>
+
+            <!-- TAB: All Orders -->
+            <div class="dash-tab" id="tab-orders">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="orderStatusFilter">
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="received">Received</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <input type="text" class="dash-search" id="orderSearch" placeholder="Search by buyer name or email…">
+                </div>
+                <div class="dash-orders-list" id="adminOrdersList">
+                    <p class="dash-empty">Loading orders…</p>
+                </div>
+            </div>
+
+            <!-- TAB: Manage Users -->
+            <div class="dash-tab" id="tab-users">
+                <div class="dash-toolbar">
+                    <select class="sort-select" id="userTypeFilter">
+                        <option value="all">All Users</option>
+                        <option value="buyer">Buyers</option>
+                        <option value="seller">Sellers</option>
+                    </select>
+                    <input type="text" class="dash-search" id="userSearch" placeholder="Search by name or email…">
+                </div>
+                <div class="admin-cards-list" id="usersList">
+                    <p class="dash-empty">Loading users…</p>
+                </div>
+            </div>
+
+            <!-- TAB: User Messages -->
+            <div class="dash-tab" id="tab-messaging">
+                <div class="dash-section-card">
+                    <h3 class="dash-section-title">Buyer-Seller Messages</h3>
+                    <p class="dash-section-sub">Monitor buyer-seller conversations for moderation (read-only)</p>
+                    <div id="adminMessagingContainer">
+                        <p class="dash-empty">Loading messaging interface…</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: Reports -->
+            <div class="dash-tab" id="tab-reports">
+                <div class="dash-section-card">
+                    <h3 class="dash-section-title">Platform Reports</h3>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px;">
+                        <button onclick="generateReport('revenue')" style="padding:16px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:24px;margin-bottom:6px;">💰</div>
+                            <div style="font-weight:600;font-size:14px;">Revenue Report</div>
+                            <div style="font-size:12px;color:#888;margin-top:2px;">Fees + Commissions breakdown</div>
+                        </button>
+                        <button onclick="generateReport('orders')" style="padding:16px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:24px;margin-bottom:6px;">📦</div>
+                            <div style="font-weight:600;font-size:14px;">Orders Report</div>
+                            <div style="font-size:12px;color:#888;margin-top:2px;">All orders by status</div>
+                        </button>
+                        <button onclick="generateReport('sellers')" style="padding:16px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:24px;margin-bottom:6px;">🏪</div>
+                            <div style="font-weight:600;font-size:14px;">Sellers Report</div>
+                            <div style="font-size:12px;color:#888;margin-top:2px;">Seller performance summary</div>
+                        </button>
+                        <button onclick="generateReport('buyers')" style="padding:16px;background:#fff;border:1px solid #e8d5b0;border-radius:10px;cursor:pointer;text-align:left;">
+                            <div style="font-size:24px;margin-bottom:6px;">👤</div>
+                            <div style="font-weight:600;font-size:14px;">Buyers Report</div>
+                            <div style="font-size:12px;color:#888;margin-top:2px;">Buyer activity summary</div>
+                        </button>
+                    </div>
+                    <div id="reportOutput"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../api/supabase.js"></script>    <script src="../js/path-helper.js"></script>
+    <script src="../js/core.js"></script>
+    <script src="../js/validators.js"></script>
+    <script src="../js/confirm-modal.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script src="../js/admin.js"></script>
+    <script src="../js/admin-messaging.js"></script>
+</body>
+</html>

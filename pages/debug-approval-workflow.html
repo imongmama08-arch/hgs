@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug: Product Approval Workflow</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .section h3 { margin-top: 0; color: #333; }
+        .status { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.approved { background: #d4edda; color: #155724; }
+        .status.rejected { background: #f8d7da; color: #721c24; }
+        .btn { padding: 8px 16px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .product-card { border: 1px solid #ddd; border-radius: 5px; padding: 10px; }
+        .product-card img { width: 100%; height: 150px; object-fit: cover; border-radius: 4px; }
+        .log { background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; font-size: 12px; max-height: 200px; overflow-y: auto; }
+        .category-filter { margin: 10px 0; }
+        .category-filter button { margin: 5px; padding: 5px 10px; border: 1px solid #ddd; background: white; cursor: pointer; }
+        .category-filter button.active { background: #007bff; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Product Approval Workflow Debug Tool</h1>
+        <p>This tool helps debug the complete product approval workflow from seller submission to buyer visibility.</p>
+
+        <!-- Test Controls -->
+        <div class="section">
+            <h3>🧪 Test Controls</h3>
+            <button class="btn btn-primary" onclick="createTestProduct()">Create Test Product</button>
+            <button class="btn btn-success" onclick="approveAllPending()">Approve All Pending</button>
+            <button class="btn btn-warning" onclick="refreshAll()">Refresh All Data</button>
+            <button class="btn btn-danger" onclick="clearTestData()">Clear Test Data</button>
+        </div>
+
+        <!-- Database State -->
+        <div class="section">
+            <h3>📊 Database State</h3>
+            <div id="dbStats"></div>
+        </div>
+
+        <!-- Admin View: Pending Products -->
+        <div class="section">
+            <h3>👨‍💼 Admin View: Pending Approval</h3>
+            <div id="pendingProducts"></div>
+        </div>
+
+        <!-- Admin View: Approved Products -->
+        <div class="section">
+            <h3>✅ Admin View: Approved Products</h3>
+            <div id="approvedProducts"></div>
+        </div>
+
+        <!-- Buyer View: Shop Products -->
+        <div class="section">
+            <h3>🛍️ Buyer View: Shop Products (What Buyers See)</h3>
+            <div class="category-filter">
+                <button class="active" onclick="filterShopProducts('all')">All</button>
+                <button onclick="filterShopProducts('shirts')">Shirts</button>
+                <button onclick="filterShopProducts('pants')">Pants</button>
+                <button onclick="filterShopProducts('jackets')">Jackets</button>
+                <button onclick="filterShopProducts('shoes')">Shoes</button>
+                <button onclick="filterShopProducts('accessories')">Accessories</button>
+            </div>
+            <div id="shopProducts"></div>
+        </div>
+
+        <!-- Debug Log -->
+        <div class="section">
+            <h3>📝 Debug Log</h3>
+            <div id="debugLog" class="log"></div>
+        </div>
+    </div>
+
+    <!-- Include Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Initialize Supabase (using same config as main app)
+        const { createClient } = supabase;
+        const db = createClient(
+            'https://jtprrhppsleunzjbolbp.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0cHJyaHBwc2xldW56amJvbGJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3Nzc1MjIsImV4cCI6MjA5MjM1MzUyMn0.OvXO8H2rHK9FIDB0nYpnxf1xMdLwlfqAi_8ihRADFZE'
+        );
+
+        let allProducts = [];
+        let currentShopFilter = 'all';
+
+        function log(message) {
+            const logEl = document.getElementById('debugLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${timestamp}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(`[Debug] ${message}`);
+        }
+
+        async function createTestProduct() {
+            const categories = ['shirts', 'pants', 'jackets', 'shoes', 'accessories'];
+            const names = ['Test Shirt', 'Test Pants', 'Test Jacket', 'Test Shoes', 'Test Bag'];
+            const randomIndex = Math.floor(Math.random() * categories.length);
+            
+            const testProduct = {
+                seller_id: 'test-seller-' + Date.now(),
+                name: names[randomIndex] + ' ' + Date.now(),
+                price: Math.floor(Math.random() * 1000) + 100,
+                category: categories[randomIndex],
+                image_url: 'assets/images/studio-white.jpg',
+                description: 'Test product for debugging approval workflow',
+                sizes: ['S', 'M', 'L'],
+                suggested_price: Math.floor(Math.random() * 1500) + 500,
+                status: 'pending',
+                in_stock: false
+            };
+
+            try {
+                const { data, error } = await db.from('products').insert(testProduct).select().single();
+                if (error) throw error;
+                
+                log(`✅ Created test product: ${testProduct.name} (${testProduct.category})`);
+                await refreshAll();
+            } catch (error) {
+                log(`❌ Failed to create test product: ${error.message}`);
+            }
+        }
+
+        async function approveAllPending() {
+            try {
+                const { data: pendingProducts, error: fetchError } = await db
+                    .from('products')
+                    .select('*')
+                    .eq('status', 'pending');
+
+                if (fetchError) throw fetchError;
+
+                if (!pendingProducts || pendingProducts.length === 0) {
+                    log('ℹ️ No pending products to approve');
+                    return;
+                }
+
+                for (const product of pendingProducts) {
+                    const { error: updateError } = await db
+                        .from('products')
+                        .update({ 
+                            status: 'approved', 
+                            in_stock: true, 
+                            rejection_reason: null 
+                        })
+                        .eq('id', product.id);
+
+                    if (updateError) {
+                        log(`❌ Failed to approve ${product.name}: ${updateError.message}`);
+                    } else {
+                        log(`✅ Approved: ${product.name} (${product.category})`);
+                    }
+                }
+
+                await refreshAll();
+            } catch (error) {
+                log(`❌ Failed to approve products: ${error.message}`);
+            }
+        }
+
+        async function clearTestData() {
+            try {
+                const { error } = await db
+                    .from('products')
+                    .delete()
+                    .like('seller_id', 'test-seller-%');
+
+                if (error) throw error;
+                
+                log('🗑️ Cleared all test data');
+                await refreshAll();
+            } catch (error) {
+                log(`❌ Failed to clear test data: ${error.message}`);
+            }
+        }
+
+        async function loadDatabaseStats() {
+            try {
+                const { count: totalProducts } = await db.from('products').select('*', { count: 'exact', head: true });
+                const { count: pendingProducts } = await db.from('products').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+                const { count: approvedProducts } = await db.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved');
+                const { count: buyerVisibleProducts } = await db.from('products').select('*', { count: 'exact', head: true }).eq('status', 'approved').eq('in_stock', true);
+
+                document.getElementById('dbStats').innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h4 style="margin: 0; color: #666;">Total Products</h4>
+                            <div style="font-size: 24px; font-weight: bold; color: #333;">${totalProducts || 0}</div>
+                        </div>
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h4 style="margin: 0; color: #856404;">Pending Approval</h4>
+                            <div style="font-size: 24px; font-weight: bold; color: #856404;">${pendingProducts || 0}</div>
+                        </div>
+                        <div style="background: #d4edda; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h4 style="margin: 0; color: #155724;">Approved</h4>
+                            <div style="font-size: 24px; font-weight: bold; color: #155724;">${approvedProducts || 0}</div>
+                        </div>
+                        <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; text-align: center;">
+                            <h4 style="margin: 0; color: #0c5460;">Buyer Visible</h4>
+                            <div style="font-size: 24px; font-weight: bold; color: #0c5460;">${buyerVisibleProducts || 0}</div>
+                        </div>
+                    </div>
+                `;
+
+                log(`📊 Stats: ${totalProducts} total, ${pendingProducts} pending, ${approvedProducts} approved, ${buyerVisibleProducts} buyer-visible`);
+            } catch (error) {
+                log(`❌ Failed to load database stats: ${error.message}`);
+            }
+        }
+
+        async function loadPendingProducts() {
+            try {
+                const { data, error } = await db
+                    .from('products')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('pendingProducts');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p>No pending products</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="product-grid">
+                        ${data.map(product => `
+                            <div class="product-card">
+                                <img src="${product.image_url}" alt="${product.name}" onerror="this.src='assets/images/studio-white.jpg'">
+                                <h4>${product.name}</h4>
+                                <p><strong>Category:</strong> ${product.category}</p>
+                                <p><strong>Price:</strong> ₱${product.price}</p>
+                                <p><strong>Status:</strong> <span class="status pending">${product.status}</span></p>
+                                <p><strong>In Stock:</strong> ${product.in_stock ? 'Yes' : 'No'}</p>
+                                <button class="btn btn-success" onclick="approveProduct('${product.id}', '${product.name}')">
+                                    Approve
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                log(`❌ Failed to load pending products: ${error.message}`);
+            }
+        }
+
+        async function loadApprovedProducts() {
+            try {
+                const { data, error } = await db
+                    .from('products')
+                    .select('*')
+                    .eq('status', 'approved')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const container = document.getElementById('approvedProducts');
+                
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<p>No approved products</p>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <div class="product-grid">
+                        ${data.map(product => `
+                            <div class="product-card">
+                                <img src="${product.image_url}" alt="${product.name}" onerror="this.src='assets/images/studio-white.jpg'">
+                                <h4>${product.name}</h4>
+                                <p><strong>Category:</strong> ${product.category}</p>
+                                <p><strong>Price:</strong> ₱${product.price}</p>
+                                <p><strong>Status:</strong> <span class="status approved">${product.status}</span></p>
+                                <p><strong>In Stock:</strong> ${product.in_stock ? 'Yes' : 'No'}</p>
+                                <p><strong>Buyer Visible:</strong> ${product.status === 'approved' && product.in_stock ? 'YES' : 'NO'}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } catch (error) {
+                log(`❌ Failed to load approved products: ${error.message}`);
+            }
+        }
+
+        async function loadShopProducts() {
+            try {
+                // This is the EXACT same query that buyers see in shop.js and script.js
+                const { data, error } = await db
+                    .from('products')
+                    .select('*')
+                    .eq('status', 'approved')
+                    .eq('in_stock', true);
+
+                if (error) throw error;
+
+                allProducts = data || [];
+                filterShopProducts(currentShopFilter);
+
+                log(`🛍️ Loaded ${allProducts.length} buyer-visible products`);
+            } catch (error) {
+                log(`❌ Failed to load shop products: ${error.message}`);
+            }
+        }
+
+        function filterShopProducts(category) {
+            currentShopFilter = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-filter button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event?.target?.classList.add('active') || document.querySelector(`[onclick="filterShopProducts('${category}')"]`)?.classList.add('active');
+
+            const filtered = category === 'all' 
+                ? allProducts 
+                : allProducts.filter(p => p.category === category);
+
+            const container = document.getElementById('shopProducts');
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<p>No products found in category: ${category}</p>`;
+                return;
+            }
+
+            // Group by category for better visualization
+            const byCategory = filtered.reduce((acc, product) => {
+                if (!acc[product.category]) acc[product.category] = [];
+                acc[product.category].push(product);
+                return acc;
+            }, {});
+
+            container.innerHTML = `
+                ${Object.entries(byCategory).map(([cat, products]) => `
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="color: #666; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
+                            ${cat.toUpperCase()} (${products.length})
+                        </h4>
+                        <div class="product-grid">
+                            ${products.map(product => `
+                                <div class="product-card" style="border-left: 4px solid #28a745;">
+                                    <img src="${product.image_url}" alt="${product.name}" onerror="this.src='assets/images/studio-white.jpg'">
+                                    <h4>${product.name}</h4>
+                                    <p><strong>Category:</strong> ${product.category}</p>
+                                    <p><strong>Price:</strong> ₱${product.price}</p>
+                                    <p><strong>Status:</strong> <span class="status approved">${product.status}</span></p>
+                                    <p><strong>In Stock:</strong> ${product.in_stock ? 'Yes' : 'No'}</p>
+                                    <p style="color: #28a745; font-weight: bold;">✅ VISIBLE TO BUYERS</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+
+            log(`🔍 Filtered shop products: ${filtered.length} in category '${category}'`);
+        }
+
+        async function approveProduct(productId, productName) {
+            try {
+                const { error } = await db
+                    .from('products')
+                    .update({ 
+                        status: 'approved', 
+                        in_stock: true, 
+                        rejection_reason: null 
+                    })
+                    .eq('id', productId);
+
+                if (error) throw error;
+                
+                log(`✅ Approved: ${productName}`);
+                await refreshAll();
+            } catch (error) {
+                log(`❌ Failed to approve ${productName}: ${error.message}`);
+            }
+        }
+
+        async function refreshAll() {
+            log('🔄 Refreshing all data...');
+            await Promise.all([
+                loadDatabaseStats(),
+                loadPendingProducts(),
+                loadApprovedProducts(),
+                loadShopProducts()
+            ]);
+            log('✅ All data refreshed');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('🚀 Debug tool initialized');
+            refreshAll();
+        });
+    </script>
+</body>
+</html>

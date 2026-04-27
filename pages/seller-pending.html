@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Pending - REWEAR</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .pending-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+        .pending-card {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .pending-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            background: #fff8e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .pending-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0 0 16px;
+        }
+        .pending-subtitle {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin: 0 0 40px;
+            line-height: 1.6;
+        }
+        .pending-info {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .pending-info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 16px;
+            font-size: 15px;
+            color: #495057;
+        }
+        .pending-info-item:last-child {
+            margin-bottom: 0;
+        }
+        .pending-info-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .pending-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn-pending {
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary-pending {
+            background: #c8a96e;
+            color: white;
+            border: none;
+        }
+        .btn-primary-pending:hover {
+            background: #b89858;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 169, 110, 0.3);
+        }
+        .btn-secondary-pending {
+            background: white;
+            color: #c8a96e;
+            border: 2px solid #c8a96e;
+        }
+        .btn-secondary-pending:hover {
+            background: #fdf8f0;
+        }
+        .pending-footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: #fff8e1;
+            color: #856404;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="pending-container">
+        <div class="pending-card">
+            <div class="pending-icon">⏳</div>
+            
+            <div class="status-badge">Application Pending Review</div>
+            
+            <h1 class="pending-title">Thank You for Applying!</h1>
+            <p class="pending-subtitle">
+                Your seller application has been submitted successfully. 
+                Our team will review your application and get back to you soon.
+            </p>
+
+            <div class="pending-info">
+                <div class="pending-info-item">
+                    <span class="pending-info-icon">📋</span>
+                    <div>
+                        <strong>What happens next?</strong><br>
+                        Our admin team will review your application within 1-3 business days.
+                    </div>
+                </div>
+                <div class="pending-info-item">
+                    <span class="pending-info-icon">📧</span>
+                    <div>
+                        <strong>How will I know?</strong><br>
+                        We'll send you an email notification once your application is approved.
+                    </div>
+                </div>
+                <div class="pending-info-item">
+                    <span class="pending-info-icon">✅</span>
+                    <div>
+                        <strong>After approval:</strong><br>
+                        You'll be able to access your seller dashboard and start listing products.
+                    </div>
+                </div>
+            </div>
+
+            <div class="pending-actions">
+                <a href="../index.html" class="btn-pending btn-primary-pending">
+                    Browse Shop
+                </a>
+                <button onclick="checkStatus()" class="btn-pending btn-secondary-pending">
+                    Check Status
+                </button>
+            </div>
+
+            <div class="pending-footer">
+                <p>Need help? <a href="contact.html" style="color:#c8a96e;font-weight:600;">Contact Support</a></p>
+                <p style="margin-top:8px;">
+                    <a href="login.html" style="color:#6c757d;">Sign in to different account</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../api/supabase.js"></script>
+    <script src="../js/core.js"></script>
+    <script src="../js/local-auth.js"></script>
+    <script>
+        // Check if user is logged in and their status
+        async function checkStatus() {
+            const user = window.authManager?.getCurrentUser();
+            
+            console.log('[pending] checkStatus called, user:', user);
+            
+            if (!user) {
+                showError('Not Logged In', 'Please log in to check your status.');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+
+            if (user.accountType !== 'seller') {
+                showError('Not a Seller', 'This page is for seller applications only.');
+                return;
+            }
+
+            if (!user.id) {
+                console.error('[pending] User ID is missing:', user);
+                showError('Error', 'User ID not found. Please log in again.');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+
+            showLoadingModal('Checking Status...', 'Please wait while we check your application status.');
+
+            try {
+                console.log('[pending] Querying sellers table for user ID:', user.id);
+                
+                const { data: seller, error } = await db
+                    .from('sellers')
+                    .select('verified, rejection_reason')
+                    .eq('id', user.id)
+                    .single();
+
+                console.log('[pending] Query result:', { seller, error });
+
+                hideLoadingModal();
+
+                if (error) {
+                    console.error('[pending] checkStatus error:', error);
+                    
+                    // If seller record doesn't exist, create it
+                    if (error.code === 'PGRST116' || error.message?.includes('no rows')) {
+                        console.log('[pending] Seller record not found, creating...');
+                        const { error: insertError } = await db.from('sellers').insert({
+                            id: user.id,
+                            business_name: user.name || user.email,
+                            email: user.email,
+                            verified: false,
+                            created_at: new Date().toISOString()
+                        });
+                        
+                        if (insertError) {
+                            console.error('[pending] Failed to create seller record:', insertError);
+                            showError('Error', 'Could not create seller record. Please contact support.');
+                        } else {
+                            showSuccess('Application Submitted', 'Your seller application is now pending review.', 'OK');
+                        }
+                        return;
+                    }
+                    
+                    showError('Error', 'Could not check status. Please try again later.');
+                    return;
+                }
+
+                if (seller.verified) {
+                    showSuccess(
+                        'Application Approved! 🎉',
+                        'Your seller application has been approved! Redirecting to your dashboard...',
+                        'Continue'
+                    );
+                    setTimeout(() => window.location.href = 'dashboard-seller.html', 2000);
+                } else if (seller.rejection_reason) {
+                    showError(
+                        'Application Rejected',
+                        `Your application was rejected. Reason: ${seller.rejection_reason}<br><br>Please contact support for more information.`
+                    );
+                } else {
+                    showSuccess(
+                        'Still Pending',
+                        'Your application is still under review. We\'ll notify you once it\'s approved.',
+                        'OK'
+                    );
+                }
+            } catch (err) {
+                hideLoadingModal();
+                showError('Error', 'Could not check status. Please try again later.');
+                console.error('[pending] checkStatus error:', err);
+            }
+        }
+
+        // Auto-check status on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('[pending] Page loaded, checking auth status...');
+            
+            // Wait for authManager to be available
+            let attempts = 0;
+            while (!window.authManager && attempts < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.authManager) {
+                console.error('[pending] authManager not available after waiting');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+                return;
+            }
+            
+            const user = window.authManager.getCurrentUser();
+            console.log('[pending] Current user:', user);
+            
+            // If not logged in, redirect to login
+            if (!user) {
+                console.log('[pending] No user logged in, redirecting to login');
+                setTimeout(() => window.location.href = 'login.html', 2000);
+                return;
+            }
+
+            // If not a seller, redirect to home
+            if (user.accountType !== 'seller') {
+                console.log('[pending] User is not a seller, redirecting to home');
+                setTimeout(() => window.location.href = '../index.html', 2000);
+                return;
+            }
+
+            // Check if already approved
+            try {
+                console.log('[pending] Auto-checking seller status for user ID:', user.id);
+                
+                const { data: seller, error } = await db
+                    .from('sellers')
+                    .select('verified')
+                    .eq('id', user.id)
+                    .single();
+
+                console.log('[pending] Auto-check result:', { seller, error });
+
+                if (error) {
+                    // If seller record doesn't exist, create it
+                    if (error.code === 'PGRST116' || error.message?.includes('no rows')) {
+                        console.log('[pending] Seller record not found, creating...');
+                        await db.from('sellers').insert({
+                            id: user.id,
+                            business_name: user.name || user.email,
+                            email: user.email,
+                            verified: false,
+                            created_at: new Date().toISOString()
+                        });
+                        console.log('[pending] Seller record created');
+                    } else {
+                        console.error('[pending] Auto-check error:', error);
+                    }
+                    return;
+                }
+
+                if (seller?.verified) {
+                    // Already approved, redirect to dashboard
+                    console.log('[pending] Seller is verified, redirecting to dashboard');
+                    showSuccess('Already Approved!', 'Redirecting to your dashboard...');
+                    setTimeout(() => window.location.href = 'dashboard-seller.html', 1500);
+                } else {
+                    console.log('[pending] Seller is not yet verified, staying on pending page');
+                }
+            } catch (err) {
+                console.error('[pending] Auto-check exception:', err);
+            }
+        });
+    </script>
+</body>
+</html>
