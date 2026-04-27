@@ -1,34 +1,65 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Wishlist — REWEAR</title>
+    <title>My Wishlist â€” REWEAR</title>
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body class="dashboard-body">
-    <aside class="dash-sidebar">
-        <div class="dash-logo">
-            <a href="../index.html">REWEAR</a>
+<body class="dashboard-body modern-dashboard">
+    <aside class="modern-sidebar">
+        <div class="sidebar-header">
+            <a href="../index.html" class="sidebar-logo">
+                <span class="logo-icon">â—†</span>
+                <span class="logo-text">REWEAR</span>
+            </a>
+            <span class="buyer-badge">Buyer</span>
         </div>
-        <nav class="dash-nav">
-            <a href="wishlist.html" class="dash-nav-link active">My Wishlist</a>
-            <a href="dashboard-buyer.html" class="dash-nav-link">My Account</a>
-            <a href="shop.html" class="dash-nav-link">Continue Shopping</a>
+
+        <nav class="sidebar-nav">
+            <a href="wishlist.html" class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" stroke-width="2"/>
+                </svg>
+                <span>My Wishlist</span>
+            </a>
+            <a href="dashboard-buyer.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke-width="2"/>
+                </svg>
+                <span>My Account</span>
+            </a>
+            <a href="shop.html" class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-width="2"/>
+                </svg>
+                <span>Continue Shopping</span>
+            </a>
         </nav>
-        <div class="dash-sidebar-footer">
-            <span class="dash-badge dash-badge-verified">Buyer</span>
-            <a href="shop.html" class="dash-back-link">Back to Shop</a>
+
+        <div class="sidebar-footer">
+            <button class="sidebar-btn" onclick="location.href='shop.html'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-width="2"/>
+                </svg>
+                Back to Shop
+            </button>
+            <button class="sidebar-btn" onclick="logout()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" stroke-width="2"/>
+                </svg>
+                Logout
+            </button>
         </div>
     </aside>
 
-    <main class="dash-main">
-        <header class="dash-header">
-            <div>
-                <h1 class="dash-page-title">My Wishlist</h1>
-                <p class="dash-page-sub">Items you've saved for later</p>
+    <main class="modern-main">
+        <header class="modern-header">
+            <div class="header-left">
+                <h1 class="page-title">My Wishlist</h1>
+                <p class="page-subtitle">Items you've saved for later</p>
             </div>
-            <div class="wishlist-header-actions">
+            <div class="header-right">
                 <span class="wishlist-count" id="wishlistCount">0 items</span>
                 <button class="btn-secondary" id="clearWishlistBtn" style="display: none;">Clear All</button>
             </div>
@@ -39,10 +70,10 @@
             <!-- Empty State -->
             <div class="wishlist-empty" id="wishlistEmpty">
                 <div class="empty-state">
-                    <span class="empty-state-icon">♡</span>
+                    <span class="empty-state-icon">â™¡</span>
                     <h3>Your wishlist is empty</h3>
                     <p>Save items you love to your wishlist and shop them later.</p>
-                    <button class="btn-primary-large" onclick="location.href='shop.html'">Start Shopping</button>
+                    <button class="btn-primary" onclick="location.href='shop.html'">Start Shopping</button>
                 </div>
             </div>
 
@@ -57,7 +88,7 @@
     <script src="../api/supabase.js"></script>`n    <script src="../js/path-helper.js"></script>
     <script src="../js/core.js"></script>
     <script src="../js/validators.js"></script>
-    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth.js"></script>
     <script src="../js/auth-nav.js"></script>
     <script>
         // ---- WISHLIST MANAGEMENT ----
@@ -107,7 +138,7 @@
         }
 
         function formatPHP(price) {
-            return `₱${price.toLocaleString()}`;
+            return `â‚±${price.toLocaleString()}`;
         }
 
         function escapeHtml(str) {
@@ -129,7 +160,7 @@
                              alt="${escapeHtml(product.name)}" loading="lazy">
                         <button type="button" class="wishlist-remove-btn" 
                                 onclick="removeFromWishlist('${product.id}')" 
-                                aria-label="Remove from wishlist">✕</button>
+                                aria-label="Remove from wishlist">âœ•</button>
                     </div>
                     <div class="wishlist-item-info">
                         <div class="wishlist-item-category">${product.category || 'REWEAR'}</div>

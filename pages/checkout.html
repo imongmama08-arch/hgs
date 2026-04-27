@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,7 @@
             <h1>Complete Your Order</h1>
             <div class="checkout-steps">
                 <div class="step active" id="step1">1. Order Details</div>
-                <div class="step" id="step2">2. Payment</div>
+                <div class="step" id="step2">2. Payment Method</div>
                 <div class="step" id="step3">3. Confirmation</div>
             </div>
         </div>
@@ -32,32 +32,63 @@
                         <input type="text" id="buyerName" required>
                     </div>
                     <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" id="buyerEmail" required>
-                    </div>
-                    <div class="form-group">
                         <label>Phone Number</label>
-                        <input type="tel" id="buyerPhone" required>
+                        <input type="tel" id="buyerPhone" required maxlength="11" placeholder="09XXXXXXXXX" pattern="[0-9]{11}">
+                        <small class="form-hint">Enter 11-digit Philippine mobile number (e.g., 09123456789)</small>
                     </div>
                     <div class="form-group">
                         <label>Complete Address</label>
                         <textarea id="deliveryAddress" rows="3" required placeholder="House/Unit No., Street, Barangay, City, Province"></textarea>
                     </div>
-                    <button type="button" class="btn-primary-large" onclick="proceedToPayment()">Proceed to Payment</button>
+                    <button type="button" class="btn-primary-large" onclick="proceedToPaymentMethod()">Choose Payment Method</button>
                 </form>
             </div>
         </div>
 
-        <!-- Step 2: Payment -->
+        <!-- Step 2: Payment Method Choice -->
         <div class="checkout-step" id="checkout-step-2">
             <div class="checkout-section">
-                <h3>Payment Method: GCash</h3>
+                <h3>Choose Payment Method</h3>
+                <div class="payment-methods">
+                    <div class="payment-method-card" onclick="selectPaymentMethod('gcash')">
+                        <div class="payment-method-icon">ðŸ’³</div>
+                        <div class="payment-method-info">
+                            <h4>GCash</h4>
+                            <p>Pay online via GCash mobile wallet</p>
+                            <span class="payment-method-badge">Instant</span>
+                        </div>
+                        <div class="payment-method-radio">
+                            <input type="radio" name="paymentMethod" value="gcash" id="gcash">
+                        </div>
+                    </div>
+                    
+                    <div class="payment-method-card" onclick="selectPaymentMethod('cod')">
+                        <div class="payment-method-icon">ðŸšš</div>
+                        <div class="payment-method-info">
+                            <h4>Cash on Delivery (COD)</h4>
+                            <p>Pay when your order arrives</p>
+                            <span class="payment-method-badge cod">COD</span>
+                        </div>
+                        <div class="payment-method-radio">
+                            <input type="radio" name="paymentMethod" value="cod" id="cod">
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-primary-large" onclick="proceedWithPayment()" id="proceedPaymentBtn" disabled>Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 3A: GCash Payment -->
+        <div class="checkout-step" id="checkout-step-gcash" style="display: none;">
+            <div class="checkout-section">
+                <h3>GCash Payment</h3>
                 <div class="payment-info">
                     <div class="gcash-details">
                         <h4>Send payment to:</h4>
                         <p><strong>GCash Number:</strong> <span id="sellerGcashNumber">Loading...</span></p>
                         <p><strong>Account Name:</strong> <span id="sellerGcashName">Loading...</span></p>
-                        <p><strong>Amount:</strong> <span id="paymentAmount">₱0.00</span></p>
+                        <p><strong>Amount:</strong> <span id="paymentAmount">â‚±0.00</span></p>
                         <p><strong>Reference:</strong> <span id="paymentReference">RWL-000000</span></p>
                     </div>
                     
@@ -68,42 +99,85 @@
                     </div>
                 </div>
                 
-                <div class="payment-proof">
+                <!-- Modern Payment Proof Upload -->
+                <div class="payment-proof-modern">
                     <h4>Upload Payment Proof</h4>
-                    <input type="file" id="paymentProof" accept="image/*" required>
-                    <div id="proofPreview"></div>
+
+                    <!-- Hidden file input â€” accepts images from camera or storage -->
+                    <input type="file" id="paymentProof" accept="image/*" capture="environment" style="display:none">
+
+                    <div class="upload-area" id="paymentUploadArea" onclick="document.getElementById('paymentProof').click()" style="cursor:pointer">
+                        <div class="upload-icon">ðŸ“·</div>
+                        <div class="upload-text">
+                            <p><strong>Tap to upload your screenshot</strong></p>
+                            <p>or <span class="upload-link">choose from gallery / camera</span></p>
+                        </div>
+                    </div>
+
+                    <div id="proofPreview" class="proof-preview"></div>
                     <button type="button" class="btn-primary-large" onclick="submitPaymentProof()" id="submitProofBtn" disabled>Submit Payment Proof</button>
-                    <button type="button" class="btn-cancel-payment" onclick="cancelPayment()" style="margin-top:12px;width:100%;padding:12px;background:#fff;border:2px solid #e74c3c;color:#e74c3c;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">Cancel Payment</button>
+                    <button type="button" class="btn-cancel-payment" onclick="cancelPayment()">Cancel Payment</button>
                 </div>
             </div>
         </div>
 
-        <!-- Step 3: Confirmation -->
+        <!-- Step 3B: COD Confirmation -->
+        <div class="checkout-step" id="checkout-step-cod" style="display: none;">
+            <div class="checkout-section">
+                <h3>Cash on Delivery</h3>
+                <div class="cod-info">
+                    <div class="cod-details">
+                        <h4>Order Details:</h4>
+                        <p><strong>Total Amount:</strong> <span id="codAmount">â‚±0.00</span></p>
+                        <p><strong>Delivery Address:</strong> <span id="codAddress">Loading...</span></p>
+                        <p><strong>Phone Number:</strong> <span id="codPhone">Loading...</span></p>
+                        <p><strong>Order Reference:</strong> <span id="codReference">RWL-000000</span></p>
+                    </div>
+                    
+                    <div class="cod-instructions">
+                        <h4>How it works:</h4>
+                        <ol>
+                            <li>We'll contact you to confirm your order</li>
+                            <li>Our delivery partner will bring your item</li>
+                            <li>Pay the exact amount when you receive the item</li>
+                            <li>Inspect the item before payment</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-primary-large" onclick="confirmCODOrder()">Confirm COD Order</button>
+                <button type="button" class="btn-cancel-payment" onclick="cancelPayment()">Cancel Order</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Final Confirmation -->
         <div class="checkout-step" id="checkout-step-3">
             <div class="checkout-section text-center">
-                <div class="success-icon">✅</div>
-                <h3>Payment Submitted!</h3>
-                <p>Your payment proof has been submitted for admin verification.</p>
-                <p style="font-size:13px;color:#888;">You will be notified once payment is verified and the seller starts preparing your item.</p>
+                <div class="success-icon">âœ…</div>
+                <h3 id="confirmationTitle">Order Placed!</h3>
+                <p id="confirmationMessage">Your order has been successfully placed.</p>
                 <div class="order-tracking">
-                    <h4>Order Reference</h4>
+                    <h4>Order Tracking</h4>
                     <p><strong>Order ID:</strong> <span id="finalOrderId"></span></p>
-                    <p><strong>Status:</strong> <span style="color:#c8a96e;font-weight:600;">Awaiting Payment Verification</span></p>
+                    <p><strong>Status:</strong> <span id="finalOrderStatus">Processing</span></p>
                 </div>
-                <div id="checkoutNextSteps"></div>
-                <div class="checkout-final-actions" style="margin-top:20px;">
-                    <a href="#" id="trackOrderLink" class="btn-secondary-large" style="display:inline-block;text-decoration:none;margin:8px;">Track Your Order</a>
-                    <button type="button" class="btn-primary-large" onclick="window.location.href='shop.html'">Continue Shopping</button>
+                <div class="checkout-final-actions">
+                    <a href="#" id="trackOrderLink" class="btn-secondary-large">Track Your Order</a>
+                    <button type="button" class="btn-primary-large" onclick="
+                      const p = window.location.pathname.includes('/pages/') ? '' : 'pages/';
+                      window.location.href = p + 'dashboard-buyer.html';
+                    ">Go to My Dashboard</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="../api/supabase.js"></script>`n    <script src="../js/path-helper.js"></script>
+    <script src="../api/supabase.js"></script>
+    <script src="../js/path-helper.js"></script>
     <script src="../js/core.js"></script>
     <script src="../js/validators.js"></script>
-    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth.js"></script>
     <script src="../js/checkout.js"></script>
 </body>
 </html>

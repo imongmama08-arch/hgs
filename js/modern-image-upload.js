@@ -153,28 +153,6 @@ class ModernImageUpload {
     return this.images;
   }
 
-  // Validate that image URL is web-accessible (not a local file path)
-  static isValidWebUrl(url) {
-    if (!url) return false;
-    
-    // Check if it's a data URL (base64)
-    if (url.startsWith('data:image/')) return true;
-    
-    // Check if it's a web URL (http/https)
-    if (url.startsWith('http://') || url.startsWith('https://')) return true;
-    
-    // Check if it's a relative path (starts with / or ./)
-    if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) return true;
-    
-    // Reject local file paths
-    if (url.startsWith('file://') || url.includes(':\\') || url.includes('C:/') || url.includes('Users/')) {
-      console.warn('[ImageUpload] Invalid local file path detected:', url);
-      return false;
-    }
-    
-    return true;
-  }
-
   reset() {
     this.images = [];
     this.renderPreviews();
@@ -187,8 +165,8 @@ class ModernImageUpload {
 let imageUploader;
 document.addEventListener('DOMContentLoaded', () => {
   imageUploader = new ModernImageUpload();
-  window.imageUploader = imageUploader; // ensure global is set after DOM ready
 });
 
-// Export class for use in other scripts
+// Export for use in other scripts
 window.ModernImageUpload = ModernImageUpload;
+window.imageUploader = imageUploader;

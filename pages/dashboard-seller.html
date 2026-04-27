@@ -1,16 +1,10 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - REWEAR</title>
     <link rel="stylesheet" href="../css/style.css">
-    <script>
-        // Stub logout function to prevent "not defined" errors before local-auth.js loads
-        window.logout = window.logout || function() { 
-            console.warn('logout called before local-auth.js loaded'); 
-        };
-    </script>
 </head>
 <body class="dashboard-body modern-dashboard">
 
@@ -18,7 +12,7 @@
 <aside class="modern-sidebar">
     <div class="sidebar-header">
         <a href="../index.html" class="sidebar-logo">
-            <span class="logo-icon">◆</span>
+            <span class="logo-icon">â—†</span>
             <span class="logo-text">REWEAR</span>
         </a>
         <span class="seller-badge">Seller</span>
@@ -61,29 +55,27 @@
             </svg>
             <span>Earnings</span>
         </a>
-        <a href="#" class="nav-item" data-tab="fees">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <rect x="2" y="5" width="20" height="14" rx="2" stroke-width="2"/>
-                <path d="M2 10h20" stroke-width="2"/>
-            </svg>
-            <span>Listing Fees</span>
-        </a>
-        <a href="#" class="nav-item" data-tab="messages">
-            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke-width="2"/>
-            </svg>
-            <span>Messages</span>
-        </a>
         <a href="#" class="nav-item" data-tab="profile">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" stroke-width="2"/>
             </svg>
             <span>Profile & Payment</span>
         </a>
+        <a href="#" class="nav-item" data-tab="verify">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/>
+            </svg>
+            <span>How to Verify</span>
+            <span class="nav-badge verification">Guide</span>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
-        <button class="sidebar-btn" onclick="location.href='../pages/shop.html'">
+        <div class="verification-status" id="verificationStatus">
+            <span class="status-badge pending">PENDING VERIFICATION</span>
+            <p class="status-text">Complete verification to start selling</p>
+        </div>
+        <button class="sidebar-btn" onclick="location.href='shop.html'">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke-width="2"/>
             </svg>
@@ -111,6 +103,12 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                     <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0" stroke-width="2"/>
                 </svg>
+            </button>
+            <button class="btn-primary" id="quickAddBtn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 5v14M5 12h14" stroke-width="2"/>
+                </svg>
+                Add Listing
             </button>
         </div>
     </header>
@@ -167,24 +165,27 @@
                 </div>
                 <div class="stat-content">
                     <p class="stat-label">Total Earnings</p>
-                    <h3 class="stat-value">₱0.00</h3>
-                    <p class="stat-change positive">+₱0 this month</p>
+                    <h3 class="stat-value">â‚±0.00</h3>
+                    <p class="stat-change positive">+â‚±0 this month</p>
                 </div>
             </div>
         </div>
 
         <!-- Verification Status -->
-        <div class="content-card" id="verificationStatusCard">
+        <div class="content-card">
             <div class="card-header">
                 <h3 class="card-title">Verification Status</h3>
             </div>
-            <div id="verificationStatusContent">
-                <div style="padding:16px;background:#e8f5e9;border-radius:10px;display:flex;gap:12px;align-items:center;">
-                    <span style="font-size:28px;">✅</span>
-                    <div>
-                        <p style="font-weight:700;margin:0;color:#155724;">Account Verified</p>
-                        <p style="margin:4px 0 0;font-size:13px;color:#555;">You are a verified seller. You can now list products and receive orders.</p>
-                    </div>
+            <div class="verification-status">
+                <div class="verification-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke-width="2"/>
+                        <path d="M22 4L12 14.01l-3-3" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="verification-content">
+                    <h4>Account Under Review</h4>
+                    <p>Your seller account is being verified by our team. This usually takes 1-3 business days. You'll receive an email once approved.</p>
                 </div>
             </div>
         </div>
@@ -284,7 +285,7 @@
                             </svg>
                             <h4>Drag & drop images here</h4>
                             <p>or click to browse from your computer</p>
-                            <span class="upload-formats">PNG, JPG, WEBP • Max 5MB each • Up to 5 images</span>
+                            <span class="upload-formats">PNG, JPG, WEBP â€¢ Max 5MB each â€¢ Up to 5 images</span>
                             <input type="file" id="imageInput" accept="image/*" multiple hidden>
                         </div>
                         <div class="image-preview-grid" id="imagePreviewGrid"></div>
@@ -304,7 +305,7 @@
                             <input type="text" class="form-input" id="newName" placeholder="e.g., Vintage Denim Jacket" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Price (₱) *</label>
+                            <label class="form-label">Price (â‚±) *</label>
                             <input type="number" class="form-input" id="newPrice" placeholder="0.00" step="0.01" required>
                         </div>
                     </div>
@@ -315,8 +316,9 @@
                             <select class="form-select" id="newCategory" required>
                                 <option value="">Select category</option>
                                 <option value="shirts">Shirts & Tops</option>
-                                <option value="pants">Pants & Bottoms</option>
+                                <option value="pants">Pants & Jeans</option>
                                 <option value="jackets">Jackets & Coats</option>
+                                <option value="dresses">Dresses & Skirts</option>
                                 <option value="shoes">Shoes</option>
                                 <option value="accessories">Accessories</option>
                             </select>
@@ -400,12 +402,12 @@
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Original Price (₱)</label>
+                            <label class="form-label">Original Price (â‚±)</label>
                             <input type="number" class="form-input" id="newSuggestedPrice" placeholder="0.00" step="0.01">
                             <span class="form-hint">Show buyers how much they're saving</span>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Shipping Fee (₱)</label>
+                            <label class="form-label">Shipping Fee (â‚±)</label>
                             <input type="number" class="form-input" id="newShippingFee" placeholder="0.00" step="0.01" value="0">
                             <span class="form-hint">Leave 0 for free shipping</span>
                         </div>
@@ -432,150 +434,25 @@
         </div>
     </div>
 
-    <!-- Messages Tab -->
-    <div class="tab-content" id="tab-messages">
-        <div class="chat-layout">
-            <!-- Conversation List -->
-            <div class="chat-sidebar" id="sellerChatSidebar">
-                <div class="chat-sidebar-header">
-                    <h3>Messages</h3>
-                    <span style="font-size:12px;color:#aaa;">Buyer Inquiries</span>
-                </div>
-                <!-- Pending -->
-                <div style="padding:8px 12px;font-size:11px;font-weight:700;color:#c8a96e;text-transform:uppercase;letter-spacing:0.5px;">⏳ Pending</div>
-                <div class="chat-conv-list" id="sellerPendingList" style="border-bottom:1px solid #f0f0f0;max-height:200px;overflow-y:auto;">
-                    <p style="padding:12px 16px;font-size:13px;color:#aaa;">No pending messages</p>
-                </div>
-                <!-- Active -->
-                <div style="padding:8px 12px;font-size:11px;font-weight:700;color:#27ae60;text-transform:uppercase;letter-spacing:0.5px;">✓ Active</div>
-                <div class="chat-conv-list" id="sellerActiveList">
-                    <p style="padding:12px 16px;font-size:13px;color:#aaa;">No active conversations</p>
-                </div>
-            </div>
-
-            <!-- Chat Window -->
-            <div class="chat-window" id="sellerChatWindow">
-                <div class="chat-empty-state" id="sellerChatEmptyState">
-                    <div style="font-size:48px;margin-bottom:12px;">💬</div>
-                    <p style="color:#888;font-size:15px;">Select a conversation to view messages</p>
-                </div>
-                <div class="chat-active" id="sellerChatActive" style="display:none;flex-direction:column;height:100%;">
-                    <div class="chat-window-header" id="sellerChatHeader"></div>
-                    <div class="chat-messages" id="sellerChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;"></div>
-                    <!-- Accept/Reject bar (shown for pending) -->
-                    <div id="sellerAcceptBar" style="display:none;padding:12px 16px;background:#fffbf0;border-top:1px solid #eee;display:flex;gap:8px;">
-                        <button onclick="sellerAcceptCurrentChat()"
-                            style="flex:1;padding:10px;background:#27ae60;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
-                            ✓ Accept Chat
-                        </button>
-                        <button onclick="sellerRejectCurrentChat()"
-                            style="flex:1;padding:10px;background:#e74c3c;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">
-                            ✕ Reject
-                        </button>
-                    </div>
-                    <!-- Reply bar (shown for accepted) -->
-                    <div class="chat-input-bar" id="sellerReplyBar" style="display:none;">
-                        <textarea id="sellerReplyInput" placeholder="Type your reply…" rows="1"
-                            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendSellerReply();}"></textarea>
-                        <button onclick="sendSellerReply()">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20">
-                                <path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Listing Fees Tab -->
-    <div class="tab-content" id="tab-fees">
-        <div class="content-card">
-            <div class="card-header">
-                <h3 class="card-title">Listing Fee</h3>
-                <p class="card-subtitle">Pay a listing fee to activate your product listings</p>
-            </div>
-
-            <!-- Current Fee Status -->
-            <div id="currentFeeStatus" style="margin-bottom:24px;">
-                <p style="color:#888;font-size:14px;">Loading fee status…</p>
-            </div>
-
-            <!-- Fee Tiers -->
-            <div class="card-header" style="margin-top:8px;">
-                <h4 class="card-title" style="font-size:16px;">Choose a Listing Tier</h4>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin:16px 0 24px;">
-                <div class="fee-tier-card" data-tier="basic" onclick="selectFeeTier('basic')" style="border:2px solid #eee;border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s;">
-                    <div style="font-size:22px;margin-bottom:8px;">🥉</div>
-                    <h4 style="margin:0 0 4px;font-size:16px;">Basic</h4>
-                    <p style="font-size:24px;font-weight:700;color:#c8a96e;margin:4px 0;">₱99</p>
-                    <p style="font-size:13px;color:#888;margin:0;">3 listings · 30 days</p>
-                </div>
-                <div class="fee-tier-card" data-tier="standard" onclick="selectFeeTier('standard')" style="border:2px solid #c8a96e;border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s;background:#fdf8f0;">
-                    <div style="font-size:22px;margin-bottom:8px;">🥈 <span style="font-size:11px;background:#c8a96e;color:#fff;padding:2px 8px;border-radius:20px;vertical-align:middle;">Popular</span></div>
-                    <h4 style="margin:0 0 4px;font-size:16px;">Standard</h4>
-                    <p style="font-size:24px;font-weight:700;color:#c8a96e;margin:4px 0;">₱249</p>
-                    <p style="font-size:13px;color:#888;margin:0;">10 listings · 60 days</p>
-                </div>
-                <div class="fee-tier-card" data-tier="premium" onclick="selectFeeTier('premium')" style="border:2px solid #eee;border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s;">
-                    <div style="font-size:22px;margin-bottom:8px;">🥇</div>
-                    <h4 style="margin:0 0 4px;font-size:16px;">Premium</h4>
-                    <p style="font-size:24px;font-weight:700;color:#c8a96e;margin:4px 0;">₱499</p>
-                    <p style="font-size:13px;color:#888;margin:0;">25 listings · 90 days</p>
-                </div>
-            </div>
-
-            <!-- GCash Payment Instructions -->
-            <div id="feePaymentSection" style="display:none;">
-                <div style="padding:16px;background:#f0f9f0;border-radius:10px;margin-bottom:16px;">
-                    <h4 style="margin:0 0 8px;font-size:15px;">Pay via GCash</h4>
-                    <p style="margin:0 0 4px;font-size:14px;">Send payment to: <strong>REWEAR Admin GCash</strong></p>
-                    <p style="margin:0 0 4px;font-size:14px;">Number: <strong>09XX-XXX-XXXX</strong></p>
-                    <p style="margin:0;font-size:14px;">Amount: <strong id="feePaymentAmount">₱0</strong></p>
-                    <p style="margin:4px 0 0;font-size:13px;color:#888;">Reference: <strong id="feePaymentRef"></strong></p>
-                </div>
-
-                <div style="margin-bottom:16px;">
-                    <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Upload GCash Payment Proof *</label>
-                    <input type="file" id="feeProofInput" accept="image/*"
-                        style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;">
-                    <div id="feeProofPreview" style="margin-top:8px;"></div>
-                </div>
-
-                <button onclick="submitFeePayment()"
-                    style="width:100%;padding:14px;background:#c8a96e;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;">
-                    Submit Payment Proof
-                </button>
-            </div>
-
-            <!-- Fee History -->
-            <div style="margin-top:24px;">
-                <h4 style="font-size:15px;margin-bottom:12px;">Fee History</h4>
-                <div id="feeHistoryList"><p style="color:#888;font-size:14px;">Loading…</p></div>
-            </div>
-        </div>
-    </div>
-
     <!-- Earnings Tab -->
     <div class="tab-content" id="tab-earnings">
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-content">
                     <p class="stat-label">Total Gross</p>
-                    <h3 class="stat-value" id="earningsTotalGross">₱0.00</h3>
+                    <h3 class="stat-value" id="earningsTotalGross">â‚±0.00</h3>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-content">
                     <p class="stat-label">Commission Deducted</p>
-                    <h3 class="stat-value" id="earningsTotalCommission">₱0.00</h3>
+                    <h3 class="stat-value" id="earningsTotalCommission">â‚±0.00</h3>
                 </div>
             </div>
             <div class="stat-card">
                 <div class="stat-content">
                     <p class="stat-label">Net Earnings</p>
-                    <h3 class="stat-value" id="earningsTotalPayout">₱0.00</h3>
+                    <h3 class="stat-value" id="earningsTotalPayout">â‚±0.00</h3>
                 </div>
             </div>
         </div>
@@ -606,28 +483,44 @@
             <form class="modern-form" id="sellerProfileForm">
                 <div class="form-section">
                     <div class="section-header">
-                        <h4 class="section-title">Business Information</h4>
+                        <h4 class="section-title">Personal Information</h4>
+                        <span class="section-badge">Required</span>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label">Business Name *</label>
-                            <input type="text" class="form-input" id="bizName" placeholder="Your business name" required>
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-input" id="bizFullName" placeholder="Your full name as shown on ID" required>
+                            <small class="form-hint">Must match the name on your government ID</small>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Email *</label>
-                            <input type="email" class="form-input" id="bizEmail" placeholder="business@example.com" required>
+                            <label class="form-label">Phone Number (GCash Number) *</label>
+                            <input type="tel" class="form-input" id="bizPhone" placeholder="09123456789" maxlength="11" pattern="[0-9]{11}" required>
+                            <small class="form-hint">11-digit Philippine mobile number (this will be your GCash number)</small>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Store Name</label>
+                            <input type="text" class="form-input" id="bizStoreName" placeholder="Your shop or business name (optional)">
+                            <small class="form-hint">Optional - helps customers identify your store</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address *</label>
+                            <input type="email" class="form-input" id="bizEmail" placeholder="your.email@example.com" required>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Phone Number</label>
-                        <input type="tel" class="form-input" id="bizPhone" placeholder="+63 912 345 6789">
+                        <label class="form-label">Location (Barangay/City) *</label>
+                        <input type="text" class="form-input" id="bizLocation" placeholder="e.g., Barangay San Antonio, Makati City" required>
+                        <small class="form-hint">Your business location for shipping and verification purposes</small>
                     </div>
 
                     <div class="form-group">
                         <label class="form-label">Business Description</label>
-                        <textarea class="form-textarea" id="bizDesc" rows="4" placeholder="Tell buyers about your business..."></textarea>
+                        <textarea class="form-textarea" id="bizDesc" rows="3" placeholder="Tell buyers about your business... (optional)"></textarea>
                     </div>
                 </div>
 
@@ -642,18 +535,13 @@
                             <circle cx="12" cy="12" r="10" stroke-width="2"/>
                             <path d="M12 16v-4M12 8h.01" stroke-width="2"/>
                         </svg>
-                        <p>Buyers will send payment to this GCash account when purchasing your products.</p>
+                        <p>Your phone number above will be used as your GCash number. Buyers will send payments to this number.</p>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">GCash Number *</label>
-                            <input type="tel" class="form-input" id="bizGcashNumber" placeholder="09XX XXX XXXX" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Account Name *</label>
-                            <input type="text" class="form-input" id="bizGcashName" placeholder="Name on GCash account" required>
-                        </div>
+                    <div class="form-group">
+                        <label class="form-label">Account Name *</label>
+                        <input type="text" class="form-input" id="bizGcashName" placeholder="Name registered on your GCash account" required>
+                        <small class="form-hint">Must match the name on your GCash account</small>
                     </div>
 
                     <!-- GCash QR Code Upload -->
@@ -671,7 +559,7 @@
                                 </svg>
                                 <h4>Upload GCash QR Code</h4>
                                 <p>Drag & drop or click to browse</p>
-                                <span class="upload-formats">PNG, JPG • Max 2MB</span>
+                                <span class="upload-formats">PNG, JPG â€¢ Max 2MB</span>
                                 <input type="file" id="qrInput" accept="image/*" hidden>
                             </div>
                             <div class="qr-preview" id="qrPreview" style="display: none;">
@@ -699,76 +587,319 @@
             </form>
         </div>
     </div>
+
+    <!-- How to Verify Tab -->
+    <div class="tab-content" id="tab-verify">
+        <div class="content-card">
+            <div class="verification-guide">
+                <div class="guide-header">
+                    <div class="guide-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="guide-title">
+                        <h3>How to Get Verified</h3>
+                        <p>Complete these steps to start selling on REWEAR</p>
+                    </div>
+                    <div class="verification-status-badge" id="verificationBadge">
+                        <span class="status-dot pending"></span>
+                        <span class="status-text">Pending Verification</span>
+                    </div>
+                </div>
+
+                <div class="verification-steps">
+                    <!-- Step 1: Complete Profile -->
+                    <div class="verification-step" data-step="1">
+                        <div class="step-number">
+                            <span>1</span>
+                        </div>
+                        <div class="step-content">
+                            <h4 class="step-title">Complete Your Profile</h4>
+                            <p class="step-description">Fill in your business information and GCash payment details</p>
+                            <div class="step-requirements">
+                                <div class="requirement">
+                                    <span class="req-icon">ðŸ‘¤</span>
+                                    <span>Full Name (as shown on ID)</span>
+                                </div>
+                                <div class="requirement">
+                                    <span class="req-icon">ðŸ“±</span>
+                                    <span>Phone Number (GCash number)</span>
+                                    <small>11-digit Philippine mobile number</small>
+                                </div>
+                                <div class="requirement">
+                                    <span class="req-icon">ðŸª</span>
+                                    <span>Store Name (optional)</span>
+                                    <small>Your business or shop name</small>
+                                </div>
+                                <div class="requirement">
+                                    <span class="req-icon">ðŸ“</span>
+                                    <span>Location (Barangay/City)</span>
+                                    <small>Your business location</small>
+                                </div>
+                            </div>
+                            <button class="step-action-btn" onclick="document.querySelector('[data-tab=&quot;profile&quot;]').click()">
+                                Complete Profile â†’
+                            </button>
+                        </div>
+                        <div class="step-status" id="step1Status">
+                            <span class="status-icon">â³</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Submit Documents -->
+                    <div class="verification-step" data-step="2">
+                        <div class="step-number">
+                            <span>2</span>
+                        </div>
+                        <div class="step-content">
+                            <h4 class="step-title">Submit Verification Documents</h4>
+                            <p class="step-description">Upload required documents for identity verification</p>
+                            <div class="step-requirements">
+                                <div class="requirement">
+                                    <span class="req-icon">ðŸ†”</span>
+                                    <span>Valid ID (photo upload)</span>
+                                    <small>Government-issued ID (front and back)</small>
+                                </div>
+                                <div class="requirement">
+                                    <span class="req-icon">ðŸ¤³</span>
+                                    <span>Selfie holding ID (optional but recommended)</span>
+                                    <small>Clear photo of you holding your ID for verification</small>
+                                </div>
+                            </div>
+                            <div class="document-upload-area">
+                                <div class="upload-section">
+                                    <h5>Upload Valid ID (Required)</h5>
+                                    <div class="upload-box" id="idUploadBox">
+                                        <div class="upload-icon">ðŸ†”</div>
+                                        <p>Drag & drop your ID here or <span class="upload-link">click to browse</span></p>
+                                        <small>Upload front and back of your government ID</small>
+                                        <input type="file" id="idUpload" accept="image/*" multiple hidden>
+                                    </div>
+                                    <div class="upload-preview" id="idPreview"></div>
+                                </div>
+                                
+                                <!-- Verification Method Selection -->
+                                <div class="verification-method-selection" style="margin-top: 24px;">
+                                    <h5>Choose Verification Method</h5>
+                                    <div class="method-tabs">
+                                        <button class="method-tab active" data-method="upload" id="uploadMethodTab">
+                                            <span class="tab-icon">ðŸ“</span>
+                                            <span class="tab-text">Upload Photo</span>
+                                        </button>
+                                        <button class="method-tab" data-method="live" id="liveMethodTab">
+                                            <span class="tab-icon">ðŸ“¹</span>
+                                            <span class="tab-text">Live Camera</span>
+                                            <span class="tab-badge">Recommended</span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Upload Method -->
+                                <div class="verification-method active" id="uploadMethod" style="margin-top: 16px;">
+                                    <div class="upload-section">
+                                        <h5>Upload Selfie with ID (Optional but Recommended)</h5>
+                                        <div class="upload-box" id="selfieUploadBox">
+                                            <div class="upload-icon">ðŸ¤³</div>
+                                            <p>Drag & drop your selfie here or <span class="upload-link">click to browse</span></p>
+                                            <small>Clear photo of you holding your ID next to your face</small>
+                                            <input type="file" id="selfieUpload" accept="image/*" hidden>
+                                        </div>
+                                        <div class="upload-preview" id="selfiePreview"></div>
+                                        
+                                        <!-- Face Verification Results -->
+                                        <div class="face-verification-results" id="faceVerificationResults" style="display: none;">
+                                            <div class="verification-header">
+                                                <h6>ðŸ¤– AI Face Verification</h6>
+                                                <span class="verification-badge" id="verificationBadge">Analyzing...</span>
+                                            </div>
+                                            <div class="verification-details" id="verificationDetails">
+                                                <div class="verification-score">
+                                                    <span class="score-label">Confidence Score:</span>
+                                                    <span class="score-value" id="confidenceScore">--</span>
+                                                </div>
+                                                <div class="verification-recommendation" id="verificationRecommendation">
+                                                    <span class="recommendation-text">Processing...</span>
+                                                </div>
+                                                <div class="verification-analysis" id="verificationAnalysis" style="display: none;">
+                                                    <details>
+                                                        <summary>View Analysis Details</summary>
+                                                        <div class="analysis-content" id="analysisContent"></div>
+                                                    </details>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Live Camera Method -->
+                                <div class="verification-method" id="liveMethod" style="margin-top: 16px;">
+                                    <div class="live-camera-section">
+                                        <h5>ðŸ“¹ Live Camera Verification</h5>
+                                        <p class="method-description">Use your camera for real-time face verification. This provides the highest security and fastest approval.</p>
+                                        
+                                        <div class="live-camera-benefits">
+                                            <div class="benefit-item">
+                                                <span class="benefit-icon">ðŸ”’</span>
+                                                <span>Most secure verification method</span>
+                                            </div>
+                                            <div class="benefit-item">
+                                                <span class="benefit-icon">âš¡</span>
+                                                <span>Faster approval process</span>
+                                            </div>
+                                            <div class="benefit-item">
+                                                <span class="benefit-icon">ðŸ¤–</span>
+                                                <span>Real-time AI analysis</span>
+                                            </div>
+                                            <div class="benefit-item">
+                                                <span class="benefit-icon">ðŸ‘ï¸</span>
+                                                <span>Live admin review</span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Live Camera Container -->
+                                        <div class="live-camera-container" id="liveCameraContainer">
+                                            <div class="camera-placeholder">
+                                                <div class="placeholder-icon">ðŸ“¹</div>
+                                                <h6>Ready for Live Verification</h6>
+                                                <p>Click the button below to start your camera and begin live face verification</p>
+                                                <button class="btn-start-camera" onclick="liveCamera.initializeCamera('liveCameraContainer')">
+                                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path d="M23 7l-7 5 7 5V7z" stroke-width="2"/>
+                                                        <rect x="1" y="5" width="15" height="14" rx="2" stroke-width="2"/>
+                                                    </svg>
+                                                    Start Live Camera
+                                                </button>
+                                                <!-- Debug button for testing -->
+                                                <button class="btn-debug-camera" onclick="window.testLiveCamera()" style="margin-left: 12px; background: #6b7280; color: white; border: none; padding: 14px 20px; border-radius: 10px; cursor: pointer;">
+                                                    ðŸ”§ Test Live Camera
+                                                </button>
+                                                <small class="camera-note">
+                                                    ðŸ“ <strong>Note:</strong> Your camera feed is processed locally and securely. 
+                                                    Only verification results are sent to our servers.
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-status" id="step2Status">
+                            <span class="status-icon">â³</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Wait for Review -->
+                    <div class="verification-step" data-step="3">
+                        <div class="step-number">
+                            <span>3</span>
+                        </div>
+                        <div class="step-content">
+                            <h4 class="step-title">Wait for Admin Review</h4>
+                            <p class="step-description">Our team will review your application within 1-3 business days</p>
+                            <div class="review-timeline">
+                                <div class="timeline-item">
+                                    <span class="timeline-icon">ðŸ“‹</span>
+                                    <div class="timeline-content">
+                                        <strong>Application Submitted</strong>
+                                        <p>We've received your verification documents</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <span class="timeline-icon">ðŸ”</span>
+                                    <div class="timeline-content">
+                                        <strong>Under Review</strong>
+                                        <p>Our team is verifying your information</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <span class="timeline-icon">âœ…</span>
+                                    <div class="timeline-content">
+                                        <strong>Approved</strong>
+                                        <p>You can start selling on REWEAR!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-status" id="step3Status">
+                            <span class="status-icon">â³</span>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Start Selling -->
+                    <div class="verification-step" data-step="4">
+                        <div class="step-number">
+                            <span>4</span>
+                        </div>
+                        <div class="step-content">
+                            <h4 class="step-title">Start Selling!</h4>
+                            <p class="step-description">Once approved, you can create your first product listing</p>
+                            <div class="selling-benefits">
+                                <div class="benefit">
+                                    <span class="benefit-icon">ðŸ›ï¸</span>
+                                    <span>List unlimited products</span>
+                                </div>
+                                <div class="benefit">
+                                    <span class="benefit-icon">ðŸ’°</span>
+                                    <span>Receive payments via GCash</span>
+                                </div>
+                                <div class="benefit">
+                                    <span class="benefit-icon">ðŸ“Š</span>
+                                    <span>Track sales and earnings</span>
+                                </div>
+                                <div class="benefit">
+                                    <span class="benefit-icon">ðŸšš</span>
+                                    <span>Manage orders and shipping</span>
+                                </div>
+                            </div>
+                            <button class="step-action-btn primary" onclick="document.querySelector('[data-tab=&quot;add&quot;]').click()">
+                                Create First Listing â†’
+                            </button>
+                        </div>
+                        <div class="step-status" id="step4Status">
+                            <span class="status-icon">ðŸ”’</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="verification-help">
+                    <h4>Need Help?</h4>
+                    <div class="help-items">
+                        <div class="help-item">
+                            <strong>ðŸ“§ Email Support:</strong>
+                            <span>support@rewear.ph</span>
+                        </div>
+                        <div class="help-item">
+                            <strong>ðŸ“± Phone Support:</strong>
+                            <span>+63 (2) 8123-4567</span>
+                        </div>
+                        <div class="help-item">
+                            <strong>â° Business Hours:</strong>
+                            <span>Monday - Friday, 9AM - 6PM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@latest/dist/face-api.min.js"></script>
 <script src="../api/supabase.js"></script>
 <script src="../js/path-helper.js"></script>
 <script src="../js/skeleton-loader.js"></script>
 <script src="../js/core.js"></script>
 <script src="../js/validators.js"></script>
-<script src="../js/local-auth.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/face-verification.js"></script>
+<script src="../js/live-camera-verification.js"></script>
 <script src="../js/modern-image-upload.js"></script>
 <script src="../js/modern-dashboard.js"></script>
-<script>
-// Stub functions to prevent "not defined" errors before dashboard-seller.js loads
-window.selectFeeTier = window.selectFeeTier || function(tier) { console.log('selectFeeTier stub:', tier); };
-window.submitFeePayment = window.submitFeePayment || function() { console.log('submitFeePayment stub'); };
-</script>
 <script src="../js/dashboard-seller.js"></script>
-<script>
-// ============================================================
-// SELLER FLOW GATE — runs after all scripts load
-// Checks: authenticated → seller role → verified → fee active
-// ============================================================
-document.addEventListener('DOMContentLoaded', async () => {
-  console.log('[seller-dashboard] DOMContentLoaded fired');
-  
-  // Wait for authManager to be available
-  if (!window.authManager) {
-    console.log('[seller-dashboard] authManager not available, waiting...');
-    await new Promise(resolve => {
-      const checkAuth = setInterval(() => {
-        if (window.authManager) {
-          clearInterval(checkAuth);
-          console.log('[seller-dashboard] authManager now available');
-          resolve();
-        }
-      }, 50);
-    });
-  } else {
-    console.log('[seller-dashboard] authManager already available');
-  }
 
-  // 1. Must be logged in
-  console.log('[seller-dashboard] Checking authentication...');
-  if (!window.authManager?.requireAuth()) {
-    console.log('[seller-dashboard] Auth check failed, redirecting...');
-    return;
-  }
-  console.log('[seller-dashboard] Auth check passed');
+</body>
+</html>
 
-  const user = window.authManager.getCurrentUser();
-  console.log('[seller-dashboard] Current user:', user);
-
-  // 2. Must be a seller account
-  console.log('[seller-dashboard] Checking account type...');
-  if (user?.accountType !== 'seller') {
-    console.log('[seller-dashboard] Not a seller account, redirecting...');
-    showError('Access Denied', 'This dashboard is for sellers only.');
-    setTimeout(() => { window.location.href = 'dashboard-buyer.html'; }, 1500);
-    return;
-  }
-  console.log('[seller-dashboard] Account type check passed - is seller');
-
-  // 3. Skip verification checks - admin already handles verification
-  console.log('[seller-dashboard] Seller dashboard ready');
-  
-  // Update sessionStorage with seller info
-  sessionStorage.setItem('rewear_user_data', JSON.stringify({
-    sellerId: user.id,
-    businessName: user.name || user.email
-  }));
-});
-</script>

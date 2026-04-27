@@ -491,25 +491,49 @@ if (sellerDash && document.querySelector('.dash-sidebar')) {
   // Add product form
   const addProductForm = document.getElementById('addProductForm');
   if (addProductForm) {
-    addProductForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      const sizes = [...document.querySelectorAll('.size-checkboxes input:checked')].map(cb => cb.value);
-      const payload = {
-        name: document.getElementById('newName').value.trim(),
-        price: parseFloat(document.getElementById('newPrice').value),
-        category: document.getElementById('newCategory').value,
-        suggested_price: parseFloat(document.getElementById('newSuggestedPrice').value) || null,
-        image_url: document.getElementById('newImageUrl').value.trim(),
-        description: document.getElementById('newDescription').value.trim(),
-        sizes: sizes.length ? sizes : ['S','M','L'],
-        in_stock: true
-      };
-      showLoadingModal('Publishing…', 'Adding your product to the store.');
-      const { error } = await db.from('products').insert(payload);
-      hideLoadingModal();
-      if (error) showError('Failed to Publish', error.message);
-      else { showSuccess('Listing Published!', `${payload.name} is now live in the shop.`, 'Got it'); addProductForm.reset(); }
-    });
+    // Prevent duplicate listeners — dashboard-seller.js already handles this
+    // Only attach if dashboard-seller.js is NOT loaded
+    if (!window._dashboardSellerLoaded) {
+      addProductForm.addEventListener('submit', async e => {
+        e.preventDefault();
+
+        // Get seller ID from auth system
+        const currentSellerId = window.authManager?.getCurrentUser()?.id
+                             || sessionStorage.getItem('rewear_seller_id');
+
+        if (!currentSellerId) {
+          showError('Not Logged In', 'Please log in again.');
+          return;
+        }
+
+        const sizes = [...document.querySelectorAll('.size-checkboxes input:checked')].map(cb => cb.value);
+        const payload = {
+          seller_id:       currentSellerId,
+          name:            document.getElementById('newName').value.trim(),
+          price:           parseFloat(document.getElementById('newPrice').value),
+          category:        document.getElementById('newCategory').value,
+          suggested_price: parseFloat(document.getElementById('newSuggestedPrice').value) || null,
+          image_url:       document.getElementById('newImageUrl').value.trim(),
+          description:     document.getElementById('newDescription').value.trim(),
+          sizes:           sizes.length ? sizes : ['S','M','L'],
+          in_stock:        false,   // admin must approve first
+          status:          'pending'
+        };
+
+        showLoadingModal('Submitting…', 'Sending your listing for admin review.');
+        const { error } = await db.from('products').insert(payload);
+        hideLoadingModal();
+
+        if (error) {
+          showError('Failed to Submit', error.message);
+        } else {
+          showSuccess('Listing Submitted!', `${payload.name} has been submitted for admin review.`, 'Got it');
+          addProductForm.reset();
+          // Reload listings tab if function exists
+          if (typeof loadSellerListings === 'function') loadSellerListings();
+        }
+      });
+    }
   }
 
   // Seller profile form

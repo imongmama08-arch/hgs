@@ -53,12 +53,11 @@ const validators = {
    */
   imageUrl: (url) => {
     if (!url || typeof url !== 'string') return false;
-    // Accept data URLs (from local file upload)
-    if (url.startsWith('data:image/')) return true;
-    // Accept any https URL
     try {
       const parsed = new URL(url);
-      return parsed.protocol === 'https:';
+      return parsed.protocol === 'https:' && 
+             (parsed.hostname.includes('cloudinary.com') || 
+              parsed.hostname.includes('res.cloudinary.com'));
     } catch {
       return false;
     }
@@ -158,7 +157,7 @@ const validationMessages = {
   price: 'Price must be between ₱1 and ₱999,999',
   phone: 'Please enter a valid Philippine phone number (e.g., 09171234567)',
   tier: 'Invalid listing tier selected',
-  imageUrl: 'Please upload a product image or provide a valid image URL',
+  imageUrl: 'Please provide a valid Cloudinary image URL',
   productName: 'Product name must be between 3 and 200 characters',
   businessName: 'Business name must be between 2 and 100 characters',
   category: 'Please select a valid category',

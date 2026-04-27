@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Auth Demo — REWEAR</title>
+    <title>Local Auth Demo â€” REWEAR</title>
     <link rel="stylesheet" href="../css/style.css">
     <style>
         .demo-container {
@@ -143,7 +143,7 @@
 
     <script src="../js/core.js"></script>
     <script src="../js/validators.js"></script>
-    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth.js"></script>
     <script>
         // Demo functions
         function updateAuthStatus() {
@@ -194,7 +194,7 @@
                             <strong>${user.name || 'No name'}</strong> (${user.email})
                             <br>
                             <small>Type: ${user.accountType} | Created: ${new Date(user.createdAt).toLocaleDateString()}</small>
-                            ${isCurrentUser ? '<br><small><strong>← Currently logged in</strong></small>' : ''}
+                            ${isCurrentUser ? '<br><small><strong>â† Currently logged in</strong></small>' : ''}
                         </div>
                         <div class="user-actions">
                             ${!isCurrentUser ? `<button onclick="deleteUser('${user.id}')" class="btn-small btn-danger">Delete</button>` : ''}
@@ -246,11 +246,11 @@
         }
 
         function showSuccess(message) {
-            alert('✓ ' + message);
+            alert('âœ“ ' + message);
         }
 
         function showError(message) {
-            alert('✗ ' + message);
+            alert('âœ— ' + message);
         }
 
         // Initialize page

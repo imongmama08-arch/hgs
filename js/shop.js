@@ -97,31 +97,18 @@ if (mobSearch) mobSearch.addEventListener('input', e => {
   onSearch(e.target.value); 
 });
 
-// ---- CATEGORY TABS ----
-document.querySelectorAll('.cat-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    currentCategory = tab.dataset.category;
-    
-    // Sync with radio buttons in sidebar
-    const radio = document.querySelector(`input[name="category"][value="${currentCategory}"]`);
-    if (radio) radio.checked = true;
-    
-    visibleCount = PAGE_SIZE;
-    updateGridTitle();
-    applyFiltersAndSort();
-  });
-});
+// ---- CATEGORY TABS (REMOVED - now handled by sidebar only) ----
+// Category tabs removed from UI, functionality moved to sidebar filters
 
+// Keep filterByCategory function for banner clicks
 function filterByCategory(cat) {
-  document.querySelectorAll('.cat-tab').forEach(t => {
-    t.classList.toggle('active', t.dataset.category === cat);
-  });
-  
   // Sync with radio buttons in sidebar
   const radio = document.querySelector(`input[name="category"][value="${cat}"]`);
-  if (radio) radio.checked = true;
+  if (radio) {
+    radio.checked = true;
+    // Trigger the change event to apply filter
+    radio.dispatchEvent(new Event('change'));
+  }
   
   currentCategory = cat;
   visibleCount = PAGE_SIZE;
@@ -581,51 +568,10 @@ function renderProducts() {
       saveWishlist();
     });
     
-    // Wire up inquiry buttons (messaging system)
-    const chatBtn = card.querySelector('.chat-product-btn');
-    if (chatBtn) {
-      chatBtn.addEventListener('click', async e => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const sellerId = chatBtn.dataset.sellerId;
-        const productId = chatBtn.dataset.productId;
-        const productName = card.dataset.name || card.querySelector('.product-name')?.textContent || 'this product';
-        
-        if (!sellerId) {
-          showError('Error', 'Seller information not available.');
-          return;
-        }
-        
-        // Get seller info
-        const { data: seller, error: sellerError } = await db
-          .from('sellers')
-          .select('business_name')
-          .eq('id', sellerId)
-          .single();
-        
-        if (sellerError) {
-          console.warn('[shop.js] Could not fetch seller:', sellerError.message);
-        }
-        
-        const sellerName = seller?.business_name || 'Seller';
-        
-        // Open inquiry modal (same as product page)
-        if (typeof openQuickChatModal === 'function') {
-          openQuickChatModal(sellerId, sellerName, productId, productName);
-        } else {
-          // Fallback to simple inquiry
-          openSimpleInquiry(sellerId, sellerName, productId, productName);
-        }
-      });
-    }
-    
     card.addEventListener('click', e => {
       // Check if the clicked element is the wishlist button or inside it
       if (e.target.classList.contains('wishlist-btn') || 
-          e.target.closest('.wishlist-btn') ||
-          e.target.classList.contains('chat-product-btn') ||
-          e.target.closest('.chat-product-btn')) {
+          e.target.closest('.wishlist-btn')) {
         return;
       }
       const prefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
@@ -666,37 +612,10 @@ function productCardHTML(p) {
   // Check if product is actually in stock (should always be true for buyer-facing products)
   const isInStock = p.in_stock !== false; // Default to true if undefined
   
-  // Seller info
-  const sellerName = p.sellers?.business_name || 'Verified Seller';
-  const sellerVerified = p.sellers?.verified || false;
-  const sellerId = p.seller_id;
-  
-  // Validate image URL - reject local file paths
-  let imageUrl = p.image_url || '../assets/images/studio-white.jpg';
-  
-  // Check if it's a local file path (invalid for web)
-  if (imageUrl.startsWith('file://') || imageUrl.includes(':\\') || imageUrl.includes('C:/') || imageUrl.includes('Users/')) {
-    console.warn('[shop.js] Invalid local file path detected for product:', p.id, imageUrl);
-    imageUrl = '../assets/images/studio-white.jpg'; // Fallback to placeholder
-  }
-  
-  // If it's a data URL, it's valid (base64 image)
-  // If it starts with http/https, it's valid (web URL)
-  // If it starts with / or ./, it's valid (relative path)
-  // Otherwise, use placeholder
-  if (!imageUrl.startsWith('data:') && 
-      !imageUrl.startsWith('http') && 
-      !imageUrl.startsWith('/') && 
-      !imageUrl.startsWith('./') &&
-      !imageUrl.startsWith('../')) {
-    console.warn('[shop.js] Invalid image URL format for product:', p.id, imageUrl);
-    imageUrl = '../assets/images/studio-white.jpg';
-  }
-  
   return `
-    <div class="product-card" data-id="${p.id}" data-name="${escapeHtml(p.name)}" data-seller-id="${sellerId || ''}">
+    <div class="product-card" data-id="${p.id}" data-name="${escapeHtml(p.name)}">
       <div class="product-image">
-        <img src="${imageUrl}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='../assets/images/studio-white.jpg'">
+        <img src="${p.image_url || 'assets/images/studio-white.jpg'}" alt="${escapeHtml(p.name)}" loading="lazy">
         <span class="condition-badge ${condition}">${condLabel}</span>
         <button type="button" class="wishlist-btn ${inWishlist ? 'wishlisted' : ''}" aria-label="Toggle wishlist">
           ${inWishlist ? '♥' : '♡'}
@@ -706,10 +625,6 @@ function productCardHTML(p) {
       <div class="product-info">
         <div class="product-brand">${p.category ? categoryLabel(p.category) : 'REWEAR'}</div>
         <div class="product-name">${escapeHtml(p.name)}</div>
-        <div class="product-seller-info">
-          <span class="seller-badge ${sellerVerified ? 'verified' : 'pending'}">${sellerVerified ? '✓ Verified' : 'Pending'}</span>
-          <span class="seller-name">${escapeHtml(sellerName)}</span>
-        </div>
         <div class="product-price-row">
           <span class="product-price">${formatPHP(p.price)}</span>
           ${p.suggested_price ? `<span class="product-suggested">${formatPHP(p.suggested_price)}</span>` : ''}
@@ -723,13 +638,6 @@ function productCardHTML(p) {
           <div class="product-rating">${starsFromRating(p.rating || 5)}</div>
         </div>
         ${!isInStock ? `<div class="product-stock-status pd-outstock">✕ Out of Stock</div>` : ''}
-        ${sellerId ? `
-          <div class="product-chat-section">
-            <button class="chat-product-btn" data-seller-id="${sellerId}" data-product-id="${p.id}">
-              💬 Chat with Seller
-            </button>
-          </div>
-        ` : ''}
       </div>
     </div>`;
 }
@@ -810,7 +718,6 @@ async function loadProducts() {
     
     // CRITICAL: This query determines what products buyers can see
     // Products must have BOTH status='approved' AND in_stock=true
-    // Note: sellers join requires seller_id FK from 05_critical_fixes.sql
     const { data, error } = await db.from('products')
       .select('*')
       .eq('status', 'approved')
@@ -822,30 +729,6 @@ async function loadProducts() {
       allProducts = getDemoProducts();
       applyFiltersAndSort();
       return;
-    }
-    
-    // Fetch seller info separately if products have seller_id
-    let sellerMap = {};
-    if (data && data.length > 0) {
-      const sellerIds = [...new Set(data.map(p => p.seller_id).filter(Boolean))];
-      if (sellerIds.length) {
-        const { data: sellers, error: sellerError } = await db
-          .from('sellers')
-          .select('id, business_name, email, verified')
-          .in('id', sellerIds);
-        
-        if (sellerError) {
-          console.warn('[shop.js] Could not fetch sellers:', sellerError.message);
-        } else {
-          (sellers || []).forEach(s => { sellerMap[s.id] = s; });
-        }
-      }
-      // Attach seller data to products
-      data.forEach(p => {
-        if (p.seller_id && sellerMap[p.seller_id]) {
-          p.sellers = sellerMap[p.seller_id];
-        }
-      });
     }
     
     console.log('[shop.js] Query results:', {
@@ -925,7 +808,7 @@ function getDemoProducts() {
       price:850, 
       suggested_price:1500, 
       category:'jackets', 
-      image_url:'../assets/images/leather-bomber-jacket.jpg', 
+      image_url:'assets/images/leather-bomber-jacket.jpg', 
       rating:5, 
       sizes:['S','M','L','XL'], 
       in_stock:true 
@@ -936,7 +819,7 @@ function getDemoProducts() {
       price:480, 
       suggested_price:900, 
       category:'shirts', 
-      image_url:'../assets/images/textured-knitted-shirt.jpg', 
+      image_url:'assets/images/textured-knitted-shirt.jpg', 
       rating:5, 
       sizes:['S','M','L'], 
       in_stock:true 
@@ -947,7 +830,7 @@ function getDemoProducts() {
       price:650, 
       suggested_price:1200, 
       category:'pants', 
-      image_url:'../assets/images/sharp-tailored-blazer.jpg', 
+      image_url:'assets/images/sharp-tailored-blazer.jpg', 
       rating:4, 
       sizes:['S','M','L'], 
       in_stock:true 
@@ -958,7 +841,7 @@ function getDemoProducts() {
       price:1100, 
       suggested_price:2200, 
       category:'accessories', 
-      image_url:'../assets/images/studio-white.jpg', 
+      image_url:'assets/images/studio-white.jpg', 
       rating:5, 
       sizes:['One Size'], 
       in_stock:true 
@@ -969,7 +852,7 @@ function getDemoProducts() {
       price:550, 
       suggested_price:1100, 
       category:'shirts', 
-      image_url:'../assets/images/oversized-hoodie.jpg', 
+      image_url:'assets/images/oversized-hoodie.jpg', 
       rating:4, 
       sizes:['S','M','L','XL'], 
       in_stock:true 
@@ -980,7 +863,7 @@ function getDemoProducts() {
       price:780, 
       suggested_price:1600, 
       category:'pants', 
-      image_url:'../assets/images/ribbed-knit-midi-dress.jpg', 
+      image_url:'assets/images/ribbed-knit-midi-dress.jpg', 
       rating:5, 
       sizes:['XS','S','M'], 
       in_stock:true 
@@ -991,7 +874,7 @@ function getDemoProducts() {
       price:700, 
       suggested_price:1400, 
       category:'pants', 
-      image_url:'../assets/images/denim-overalls.jpg', 
+      image_url:'assets/images/denim-overalls.jpg', 
       rating:4, 
       sizes:['S','M','L'], 
       in_stock:true 
@@ -1002,190 +885,12 @@ function getDemoProducts() {
       price:920, 
       suggested_price:1800, 
       category:'jackets', 
-      image_url:'../assets/images/editorial-blazer.jpg', 
+      image_url:'assets/images/editorial-blazer.jpg', 
       rating:5, 
       sizes:['S','M','L'], 
       in_stock:true 
     },
   ];
 }
-
-// ---- SIMPLE INQUIRY MODAL (Fallback) ----
-function openSimpleInquiry(sellerId, sellerName, productId, productName) {
-  const currentUser = window.authManager?.getCurrentUser();
-  const overlay = document.createElement('div');
-  overlay.id = 'simpleInquiryOverlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;';
-  overlay.innerHTML = `
-    <div style="background:#fff;border-radius:16px;padding:32px;max-width:440px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,0.3);">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-        <div>
-          <h3 style="margin:0 0 4px;font-size:18px;">Send Inquiry</h3>
-          <p style="color:#888;font-size:13px;margin:0;">to ${sellerName}</p>
-        </div>
-        <button onclick="document.getElementById('simpleInquiryOverlay').remove()"
-          style="width:32px;height:32px;border:none;background:#f5f5f5;border-radius:50%;cursor:pointer;font-size:18px;color:#666;">
-          ×
-        </button>
-      </div>
-
-      <div style="background:#f9f9f9;padding:10px;border-radius:8px;margin-bottom:16px;font-size:13px;color:#666;">
-        About: <strong>${productName}</strong>
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Your Name</label>
-        <input id="simpleInquiryName" type="text" value="${currentUser?.name || ''}" placeholder="Your name"
-          style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;">
-      </div>
-
-      <div style="margin-bottom:12px;">
-        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Your Email</label>
-        <input id="simpleInquiryEmail" type="email" value="${currentUser?.email || ''}" placeholder="your@email.com"
-          style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;">
-      </div>
-
-      <div style="margin-bottom:16px;">
-        <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px;">Message</label>
-        <textarea id="simpleInquiryMessage" rows="4" placeholder="Ask about this product..."
-          style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;resize:vertical;box-sizing:border-box;"></textarea>
-      </div>
-
-      <div style="display:flex;gap:12px;">
-        <button onclick="submitSimpleInquiry('${sellerId}', '${productId}')"
-          style="flex:1;padding:12px;background:#c8a96e;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;">
-          Send Message
-        </button>
-        <button onclick="document.getElementById('simpleInquiryOverlay').remove()"
-          style="padding:12px 20px;background:#f5f5f5;color:#333;border:none;border-radius:8px;font-size:15px;cursor:pointer;">
-          Cancel
-        </button>
-      </div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  
-  // Close on overlay click
-  overlay.addEventListener('click', (e) => {
-    if (e.target.id === 'simpleInquiryOverlay') {
-      overlay.remove();
-    }
-  });
-}
-
-async function submitSimpleInquiry(sellerId, productId) {
-  const name = document.getElementById('simpleInquiryName')?.value.trim();
-  const email = document.getElementById('simpleInquiryEmail')?.value.trim();
-  const message = document.getElementById('simpleInquiryMessage')?.value.trim();
-  
-  if (!name || !email || !message) {
-    alert('Please fill in all fields.');
-    return;
-  }
-  
-  if (!email.includes('@') || !email.includes('.')) {
-    alert('Please enter a valid email address.');
-    return;
-  }
-  
-  // Check if db is available
-  if (typeof db === 'undefined' || !db) {
-    console.error('[submitSimpleInquiry] Database client not available');
-    showError('Connection Error', 'Database connection not available. Please refresh the page and try again.');
-    return;
-  }
-  
-  try {
-    showLoadingModal('Sending...', 'Sending your message to the seller.');
-    
-    // CRITICAL FIX: Use logged-in user's email if available, otherwise use form email
-    const currentUser = window.authManager?.getCurrentUser();
-    const buyerEmail = currentUser?.email || email;
-    
-    console.log('[submitSimpleInquiry] Using buyer email:', buyerEmail, '(from:', currentUser ? 'logged-in user' : 'form input', ')');
-    
-    const payload = {
-      seller_id: sellerId,
-      buyer_name: name,
-      buyer_email: buyerEmail, // Use consistent email
-      message: message
-    };
-    if (productId && productId !== 'undefined') {
-      payload.product_id = productId;
-    }
-    
-    console.log('[submitSimpleInquiry] Sending message:', payload);
-    
-    // Use messagesDb for messages (separate Supabase project)
-    const { data, error } = await messagesDb.from('messages').insert(payload);
-    
-    if (error) {
-      console.error('[submitSimpleInquiry] Database error:', error);
-      console.error('[submitSimpleInquiry] Error details:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
-      
-      // Check if it's a "table not found" error
-      if (error.message && error.message.includes('messages') && error.message.includes('schema cache')) {
-        hideLoadingModal();
-        showError(
-          'Setup Required',
-          'The messaging system needs to be set up in the database. Please contact the administrator to enable this feature.',
-          'OK'
-        );
-        return;
-      }
-      
-      throw new Error(error.message || 'Database error occurred');
-    }
-    
-    console.log('[submitSimpleInquiry] Message sent successfully:', data);
-    
-    hideLoadingModal();
-    document.getElementById('simpleInquiryOverlay')?.remove();
-    
-    const prefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
-    showSuccess(
-      'Message Sent! ✉️',
-      `Your message has been sent to the seller. <br><br><a href="${prefix}dashboard-buyer.html#messages" style="color:#c8a96e;font-weight:600;text-decoration:underline;">View in Messages →</a>`,
-      'Got it'
-    );
-  } catch (err) {
-    hideLoadingModal();
-    console.error('[submitSimpleInquiry] Exception:', err);
-    
-    // Check if it's a table not found error
-    if (err.message && err.message.includes('Setup Required')) {
-      // Already handled above
-      return;
-    }
-    
-    // Provide more specific error message
-    let errorMsg = 'Could not send message. ';
-    if (err.message) {
-      errorMsg += err.message;
-    } else {
-      errorMsg += 'Please check your connection and try again.';
-    }
-    
-    // Offer alternative contact method
-    const alternativeContact = `
-      <div style="margin-top:12px;padding:12px;background:#f9f9f9;border-radius:8px;text-align:left;">
-        <p style="margin:0 0 8px;font-weight:600;font-size:13px;">Alternative: Contact via Email</p>
-        <p style="margin:0;font-size:12px;color:#666;">
-          You can email the seller directly at their contact email, or save your message and try again later.
-        </p>
-      </div>
-    `;
-    
-    showError('Failed to Send', errorMsg + alternativeContact);
-  }
-}
-
-// Make function globally accessible for onclick handlers
-window.submitSimpleInquiry = submitSimpleInquiry;
 
 loadProducts();

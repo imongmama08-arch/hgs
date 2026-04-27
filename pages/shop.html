@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,8 +10,8 @@
     <!-- Announcement Bar -->
     <div class="announcement-bar">
         <div class="announcement-track">
-            <span>✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life ✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life · </span>
-            <span>✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life ✦ Preloved finds, new story · Authenticated pieces only · Free shipping on orders over ₱1,500 · Shop sustainably · Verified sellers · Every purchase gives clothes a second life · </span>
+            <span>âœ¦ Preloved finds, new story Â· Authenticated pieces only Â· Free shipping on orders over â‚±1,500 Â· Shop sustainably Â· Verified sellers Â· Every purchase gives clothes a second life âœ¦ Preloved finds, new story Â· Authenticated pieces only Â· Free shipping on orders over â‚±1,500 Â· Shop sustainably Â· Verified sellers Â· Every purchase gives clothes a second life Â· </span>
+            <span>âœ¦ Preloved finds, new story Â· Authenticated pieces only Â· Free shipping on orders over â‚±1,500 Â· Shop sustainably Â· Verified sellers Â· Every purchase gives clothes a second life âœ¦ Preloved finds, new story Â· Authenticated pieces only Â· Free shipping on orders over â‚±1,500 Â· Shop sustainably Â· Verified sellers Â· Every purchase gives clothes a second life Â· </span>
         </div>
     </div>
 
@@ -31,7 +31,7 @@
             <div class="nav-actions">
                 <div class="nav-search">
                     <input type="text" id="navSearchInput" placeholder="Search products..." class="nav-search-input">
-                    <button class="nav-search-btn">🔍</button>
+                    <button class="nav-search-btn">ðŸ”</button>
                 </div>
                 <div class="auth-nav" id="authNav">
                     <a href="login.html" class="nav-link">Login</a>
@@ -40,7 +40,7 @@
                 <div class="user-nav hidden" id="userNav">
                     <div class="wishlist-nav">
                         <button class="wishlist-nav-btn" onclick="location.href='wishlist.html'">
-                            <span>♡</span>
+                            <span>â™¡</span>
                             <span class="wishlist-badge" id="wishlistBadge" style="display: none;">0</span>
                         </button>
                     </div>
@@ -63,12 +63,12 @@
             <img src="../assets/images/hero-trench-editorial.jpg" alt="Verified Preloved Marketplace">
         </div>
         <div class="hero-content">
-            <div class="hero-badge">✦ Verified Preloved Marketplace</div>
+            <div class="hero-badge">âœ¦ Verified Preloved Marketplace</div>
             <h1 class="hero-title">Find Your Next<br>Favourite Piece</h1>
-            <p class="hero-subtitle">Curated preloved fashion from trusted sellers. Every item tells a story — find the one that fits yours.</p>
+            <p class="hero-subtitle">Curated preloved fashion from trusted sellers. Every item tells a story â€” find the one that fits yours.</p>
             <div class="hero-stats">
                 <div class="hero-stat">
-                    <span class="hero-stat-number" id="statListings">—</span>
+                    <span class="hero-stat-number" id="statListings">â€”</span>
                     <span class="hero-stat-label">Active Listings</span>
                 </div>
                 <div class="hero-stat">
@@ -86,28 +86,28 @@
     <!-- Trust Badges -->
     <section class="trust-badges">
         <div class="trust-badge">
-            <div class="trust-icon">🛡️</div>
+            <div class="trust-icon">ðŸ›¡ï¸</div>
             <div class="trust-text">
                 <strong>Buyer Protection</strong>
                 <span>Secure transactions</span>
             </div>
         </div>
         <div class="trust-badge">
-            <div class="trust-icon">✓</div>
+            <div class="trust-icon">âœ“</div>
             <div class="trust-text">
                 <strong>Authenticated Items</strong>
                 <span>Reviewed by REWEAR</span>
             </div>
         </div>
         <div class="trust-badge">
-            <div class="trust-icon">↩️</div>
+            <div class="trust-icon">â†©ï¸</div>
             <div class="trust-text">
                 <strong>Easy Returns</strong>
                 <span>Hassle-free process</span>
             </div>
         </div>
         <div class="trust-badge">
-            <div class="trust-icon">🚚</div>
+            <div class="trust-icon">ðŸšš</div>
             <div class="trust-text">
                 <strong>Nationwide Delivery</strong>
                 <span>Across the Philippines</span>
@@ -115,41 +115,16 @@
         </div>
     </section>
 
-    <!-- Filter Section -->
+    <!-- Filter Section â€” only view toggle remains, category tabs removed (sidebar handles it) -->
     <section class="filter-section">
         <div class="container">
-            <div class="filter-bar">
-                <div class="filter-tabs">
-                    <button class="cat-tab active" data-category="all">All Items <span id="cnt-all"></span></button>
-                    <button class="cat-tab" data-category="shirts">Tops <span id="cnt-shirts"></span></button>
-                    <button class="cat-tab" data-category="pants">Bottoms <span id="cnt-pants"></span></button>
-                    <button class="cat-tab" data-category="jackets">Outerwear <span id="cnt-jackets"></span></button>
-                    <button class="cat-tab" data-category="shoes">Footwear <span id="cnt-shoes"></span></button>
-                    <button class="cat-tab" data-category="accessories">Accessories <span id="cnt-accessories"></span></button>
-                </div>
+            <div class="filter-bar filter-bar-slim">
                 <div class="filter-controls">
-                    <div class="sort-control">
-                        <button class="sort-btn" id="sortBtn">
-                            <span id="sortLabel">Sort</span>
-                            <span>▼</span>
-                        </button>
-                        <select class="sort-select" id="sortSelect">
-                            <option value="default">Default</option>
-                            <option value="newest">Newest First</option>
-                            <option value="price_asc">Price: Low → High</option>
-                            <option value="price_desc">Price: High → Low</option>
-                            <option value="rating">Top Rated</option>
-                            <option value="savings">Best Savings</option>
-                        </select>
-                    </div>
                     <div class="view-controls">
-                        <button class="view-btn active" id="gridViewBtn">⊞</button>
-                        <button class="view-btn" id="listViewBtn">☰</button>
+                        <button class="view-btn active" id="gridViewBtn">âŠž</button>
+                        <button class="view-btn" id="listViewBtn">â˜°</button>
                     </div>
-                    <button class="filter-btn" id="filterBtn">
-                        <span>Filters</span>
-                        <span class="filter-count-badge" id="filterCountBadge" style="display: none;">0</span>
-                    </button>
+                    <span class="results-chip" id="resultsChip">â€” results</span>
                 </div>
             </div>
             <div class="active-filters-bar" id="activeFiltersBar"></div>
@@ -162,21 +137,21 @@
             <div class="banner-grid">
                 <div class="featured-banner" onclick="filterByCategory('jackets')">
                     <div class="banner-content">
-                        <div class="banner-badge">✦ Just Dropped</div>
+                        <div class="banner-badge">âœ¦ Just Dropped</div>
                         <h3 class="banner-title">Preloved<br>Outerwear</h3>
                         <button class="banner-btn">
                             Shop Now
-                            <span>→</span>
+                            <span>â†’</span>
                         </button>
                     </div>
                 </div>
                 <div class="featured-banner" onclick="filterByCategory('shirts')">
                     <div class="banner-content">
-                        <div class="banner-badge">✦ Best Sellers</div>
+                        <div class="banner-badge">âœ¦ Best Sellers</div>
                         <h3 class="banner-title">Elevated<br>Tops & Shirts</h3>
                         <button class="banner-btn">
                             Explore
-                            <span>→</span>
+                            <span>â†’</span>
                         </button>
                     </div>
                 </div>
@@ -235,10 +210,20 @@
                     <!-- Price Range Filter -->
                     <div class="filter-section">
                         <h4 class="filter-section-title">Price Range</h4>
+                        <div class="price-range-hints">
+                            <div class="price-hint">ðŸ’° Most items: â‚±200 - â‚±2,000</div>
+                            <div class="price-hint">âœ¨ Premium pieces: â‚±2,000+</div>
+                        </div>
                         <div class="price-range-inputs">
-                            <input type="number" id="priceMin" placeholder="Min" class="price-input">
-                            <span class="price-separator">—</span>
-                            <input type="number" id="priceMax" placeholder="Max" class="price-input">
+                            <input type="number" id="priceMin" placeholder="â‚±200" class="price-input">
+                            <span class="price-separator">â€”</span>
+                            <input type="number" id="priceMax" placeholder="â‚±2,000" class="price-input">
+                        </div>
+                        <div class="price-quick-filters">
+                            <button class="price-quick-btn" onclick="setQuickPrice(0, 500)">Under â‚±500</button>
+                            <button class="price-quick-btn" onclick="setQuickPrice(500, 1000)">â‚±500 - â‚±1K</button>
+                            <button class="price-quick-btn" onclick="setQuickPrice(1000, 2000)">â‚±1K - â‚±2K</button>
+                            <button class="price-quick-btn" onclick="setQuickPrice(2000, 999999)">â‚±2K+</button>
                         </div>
                     </div>
 
@@ -290,7 +275,7 @@
                     <div class="load-more-wrap" id="loadMoreWrap" style="display: none;">
                         <button class="load-more-btn" id="loadMoreBtn">
                             Load More
-                            <span>↓</span>
+                            <span>â†“</span>
                         </button>
                         <p class="load-more-progress" id="loadMoreProgress"></p>
                     </div>
@@ -302,7 +287,7 @@
     <!-- Community Section -->
     <section class="community-section">
         <div class="container">
-            <div class="community-icon">◆</div>
+            <div class="community-icon">â—†</div>
             <h2 class="community-title">Wear it. Love it.<br>Pass it on.</h2>
             <p class="community-text">Join thousands who shop and sell preloved fashion on REWEAR. Every piece finds a new home. Share your looks with #REWEARStyle</p>
             <button class="btn-primary-large" onclick="location.href='dashboard-seller.html'">Sell Your Pieces</button>
@@ -395,7 +380,7 @@
     <div class="filter-drawer" id="filterDrawer">
         <div class="drawer-header">
             <h3>Filters</h3>
-            <button class="drawer-close" id="drawerClose">✕</button>
+            <button class="drawer-close" id="drawerClose">âœ•</button>
         </div>
         <div class="drawer-content">
             <div class="filter-group">
@@ -408,10 +393,10 @@
                 </div>
             </div>
             <div class="filter-group">
-                <h4>Price Range (₱)</h4>
+                <h4>Price Range (â‚±)</h4>
                 <div class="price-inputs">
                     <input type="number" id="priceMin" placeholder="Min" class="price-input">
-                    <span>—</span>
+                    <span>â€”</span>
                     <input type="number" id="priceMax" placeholder="Max" class="price-input">
                 </div>
             </div>
@@ -438,7 +423,7 @@
     <script src="../js/skeleton-loader.js"></script>
     <script src="../js/core.js"></script>
     <script src="../js/validators.js"></script>
-    <script src="../js/local-auth.js"></script>
+    <script src="../js/auth.js"></script>
     <script src="../js/auth-nav.js"></script>
     <script src="../js/shop.js"></script>
 </body>

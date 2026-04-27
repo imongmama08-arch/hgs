@@ -270,25 +270,7 @@ class LocalAuthManager {
   // ---- USER PROFILE MANAGEMENT (Local Only) ----
 
   async createUserProfile(user, userData) {
-    // If seller, create a seller application record in Supabase
-    if (userData.accountType === 'seller') {
-      try {
-        const { error } = await db.from('sellers').insert({
-          id:            user.id,
-          business_name: userData.name || user.email,
-          email:         user.email,
-          verified:      false,  // Requires admin approval
-          description:   'Pending verification'
-        });
-        if (error && !error.message?.includes('duplicate')) {
-          console.warn('[local-auth] Could not create seller record:', error.message);
-        } else {
-          console.log('[local-auth] Seller application created for:', user.email);
-        }
-      } catch (e) {
-        console.warn('[local-auth] Seller record creation failed (non-fatal):', e.message);
-      }
-    }
+    // Profile creation is handled locally - no Supabase database calls
     console.log('[local-auth] User profile created locally:', user.email);
   }
 
@@ -336,7 +318,7 @@ class LocalAuthManager {
   }
 
   clearAuthState() {
-    // Clear localStorage
+    // Clear localStorage (but keep admin session)
     localStorage.removeItem('rewear_current_user');
     localStorage.removeItem('rewear_remember_me');
     
@@ -347,7 +329,7 @@ class LocalAuthManager {
     sessionStorage.removeItem('rewear_user_email');
     sessionStorage.removeItem('rewear_user_type');
     sessionStorage.removeItem('rewear_user_data');
-    sessionStorage.removeItem('rewear_admin');
+    // NOTE: do NOT clear rewear_admin here — admin uses localStorage now
   }
 
   // ---- NAVIGATION & REDIRECTS ----
@@ -356,7 +338,7 @@ class LocalAuthManager {
     sessionStorage.setItem('rewear_redirect_after_login', url);
   }
 
-  async handleAuthRedirect() {
+  handleAuthRedirect() {
     // Emit auth state change event
     document.dispatchEvent(new CustomEvent('authStateChanged'));
     
@@ -368,38 +350,13 @@ class LocalAuthManager {
       return;
     }
 
-    // Default redirects based on account type
+    // Default redirects based on account type - redirect to shop for better UX
     const userType = sessionStorage.getItem('rewear_user_type');
     const prefix = window.location.pathname.includes('/pages/') ? '' : 'pages/';
-    
     if (userType === 'seller') {
-      // Check if seller is verified before redirecting to dashboard
-      const userId = this.currentUser?.id;
-      if (userId) {
-        try {
-          const { data: seller } = await db
-            .from('sellers')
-            .select('verified')
-            .eq('id', userId)
-            .single();
-          
-          if (seller?.verified) {
-            // Verified seller - go to dashboard
-            window.location.href = prefix + 'dashboard-seller.html';
-          } else {
-            // Unverified seller - go to pending page
-            window.location.href = prefix + 'seller-pending.html';
-          }
-        } catch (err) {
-          console.error('[local-auth] Could not check seller status:', err);
-          // Fallback to pending page if error
-          window.location.href = prefix + 'seller-pending.html';
-        }
-      } else {
-        window.location.href = prefix + 'seller-pending.html';
-      }
+      window.location.href = prefix + 'dashboard-seller.html';
     } else {
-      window.location.href = prefix + 'shop.html';
+      window.location.href = prefix + 'shop.html'; // Changed from index.html to shop.html
     }
   }
 
@@ -422,24 +379,6 @@ class LocalAuthManager {
   // ---- AUTH GUARDS ----
 
   requireAuth(requiredType = null) {
-    // Ensure auth manager is initialized
-    if (!this.isInitialized) {
-      console.warn('[local-auth] requireAuth called before initialization complete');
-      // Try to initialize now if not done
-      if (!this.currentUser) {
-        const savedUser = localStorage.getItem('rewear_current_user');
-        if (savedUser) {
-          try {
-            this.currentUser = JSON.parse(savedUser);
-            this.syncUserSession(this.currentUser);
-          } catch (error) {
-            console.error('[local-auth] Failed to parse saved user:', error);
-          }
-        }
-      }
-      this.isInitialized = true;
-    }
-
     if (!this.currentUser) {
       this.redirectToLogin('Please log in to access this page.');
       return false;
@@ -646,13 +585,8 @@ class LocalAuthManager {
         if (error) {
           this.showFormError(error.message);
         } else {
-          // For sellers, show a brief message before redirecting
-          if (accountType === 'seller') {
-            this.showFormSuccess('Seller application submitted! You can complete your profile while waiting for approval.');
-            setTimeout(() => this.handleAuthRedirect(), 2000);
-          } else {
-            this.handleAuthRedirect();
-          }
+          // Success - redirect immediately
+          this.handleAuthRedirect();
         }
       } catch (err) {
         console.error('[local-auth] Unexpected error during signup:', err);
@@ -885,7 +819,7 @@ function requireVerifiedSeller() {
 }
 
 // ---- LOGOUT FUNCTIONALITY ----
-window.logout = async function logout() {
+async function logout() {
   const { error } = await window.authManager.signOut();
   if (error) {
     showError('Logout Failed', error.message);

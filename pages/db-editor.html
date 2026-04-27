@@ -1,0 +1,432 @@
+﻿﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DB Editor - REWEAR Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:#0f0f0f;color:#e0e0e0;min-height:100vh}
+.gate{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0f0f0f}
+.gate-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:48px;text-align:center;width:360px}
+.gate-logo{font-size:28px;font-weight:800;color:#d4a843;margin-bottom:8px}
+.gate-sub{color:#666;font-size:14px;margin-bottom:32px}
+.pin-row{display:flex;gap:12px;justify-content:center;margin-bottom:16px}
+.pin-digit{width:56px;height:64px;text-align:center;font-size:24px;font-weight:700;background:#111;border:2px solid #333;border-radius:10px;color:#fff;outline:none}
+.pin-digit:focus{border-color:#d4a843}
+.pin-error{color:#ef4444;font-size:13px;margin-bottom:16px;min-height:20px}
+.btn-enter{width:100%;padding:14px;background:#d4a843;color:#000;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-enter:hover{background:#e6b84a}
+.app{display:none;flex-direction:row;min-height:100vh}
+.sidebar{width:220px;background:#111;border-right:1px solid #222;padding:20px 0;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{padding:0 20px 24px;font-size:18px;font-weight:800;color:#d4a843;border-bottom:1px solid #222}
+.sidebar-logo span{color:#fff;font-size:12px;display:block;font-weight:400;margin-top:2px}
+.table-list{flex:1;padding:16px 0;overflow-y:auto}
+.table-btn{width:100%;text-align:left;padding:10px 20px;background:none;border:none;color:#aaa;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:all 0.15s}
+.table-btn:hover{background:#1a1a1a;color:#fff}
+.table-btn.active{background:#1a1a1a;color:#d4a843;border-left:3px solid #d4a843}
+.table-count{background:#222;color:#666;font-size:11px;padding:2px 7px;border-radius:10px}
+.table-btn.active .table-count{background:#d4a843;color:#000}
+.sidebar-footer{padding:16px 20px;border-top:1px solid #222}
+.btn-logout{width:100%;padding:8px;background:none;border:1px solid #333;border-radius:8px;color:#666;font-size:12px;cursor:pointer}
+.btn-logout:hover{border-color:#ef4444;color:#ef4444}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:16px 24px;background:#111;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.topbar-title{font-size:18px;font-weight:700;color:#fff}
+.topbar-title span{color:#d4a843}
+.topbar-actions{display:flex;gap:10px;align-items:center}
+.search-box{padding:8px 14px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#fff;font-size:13px;width:220px;outline:none}
+.search-box:focus{border-color:#d4a843}
+.btn-add{padding:8px 16px;background:#d4a843;color:#000;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-add:hover{background:#e6b84a}
+.btn-refresh{padding:8px 12px;background:#1a1a1a;border:1px solid #333;border-radius:8px;color:#aaa;font-size:13px;cursor:pointer}
+.btn-refresh:hover{border-color:#d4a843;color:#d4a843}
+.content{flex:1;overflow:auto;padding:24px}
+.empty-state{text-align:center;padding:80px 20px;color:#444}
+.empty-state h3{font-size:18px;margin-bottom:8px;color:#666}
+.table-wrap{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
+.table-info{padding:16px 20px;border-bottom:1px solid #222;display:flex;align-items:center;gap:12px}
+.table-info-name{font-size:15px;font-weight:700;color:#fff}
+.table-info-count{font-size:13px;color:#666}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{padding:10px 14px;text-align:left;background:#161616;color:#888;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #222;white-space:nowrap}
+.tbl td{padding:10px 14px;border-bottom:1px solid #1a1a1a;color:#ccc;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+.tbl tr:hover td{background:#161616}
+.tbl tr:last-child td{border-bottom:none}
+.td-actions{display:flex;gap:6px;white-space:nowrap}
+.btn-edit{padding:4px 10px;background:#1e3a5f;border:1px solid #2563eb;border-radius:5px;color:#60a5fa;font-size:11px;cursor:pointer}
+.btn-edit:hover{background:#2563eb;color:#fff}
+.btn-del{padding:4px 10px;background:#3f1515;border:1px solid #dc2626;border-radius:5px;color:#f87171;font-size:11px;cursor:pointer}
+.btn-del:hover{background:#dc2626;color:#fff}
+.badge-true{background:#14532d;color:#4ade80;padding:2px 8px;border-radius:10px;font-size:11px}
+.badge-false{background:#3f1515;color:#f87171;padding:2px 8px;border-radius:10px;font-size:11px}
+.badge-pending{background:#451a03;color:#fb923c;padding:2px 8px;border-radius:10px;font-size:11px}
+.badge-approved{background:#14532d;color:#4ade80;padding:2px 8px;border-radius:10px;font-size:11px}
+.badge-rejected{background:#3f1515;color:#f87171;padding:2px 8px;border-radius:10px;font-size:11px}
+.badge-confirmed{background:#1e3a5f;color:#60a5fa;padding:2px 8px;border-radius:10px;font-size:11px}
+.loading{text-align:center;padding:60px;color:#444}
+.loading-spin{display:inline-block;width:32px;height:32px;border:3px solid #333;border-top-color:#d4a843;border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal{background:#1a1a1a;border:1px solid #333;border-radius:16px;width:600px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-head{padding:20px 24px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font-size:16px;font-weight:700;color:#fff}
+.modal-close{background:none;border:none;color:#666;font-size:22px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#fff}
+.modal-body{padding:24px}
+.field-group{margin-bottom:16px}
+.field-label{display:block;font-size:12px;font-weight:600;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px}
+.field-input{width:100%;padding:10px 12px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:13px;outline:none}
+.field-input:focus{border-color:#d4a843}
+.field-input[readonly]{color:#555;cursor:not-allowed}
+.modal-foot{padding:16px 24px;border-top:1px solid #222;display:flex;justify-content:flex-end;gap:10px}
+.btn-cancel{padding:9px 18px;background:none;border:1px solid #333;border-radius:8px;color:#aaa;font-size:13px;cursor:pointer}
+.btn-cancel:hover{border-color:#666;color:#fff}
+.btn-save{padding:9px 18px;background:#d4a843;border:none;border-radius:8px;color:#000;font-size:13px;font-weight:700;cursor:pointer}
+.btn-save:hover{background:#e6b84a}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:9999;animation:slideIn 0.3s ease}
+.toast.success{background:#14532d;color:#4ade80;border:1px solid #166534}
+.toast.error{background:#3f1515;color:#f87171;border:1px solid #991b1b}
+@keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.pagination{display:flex;align-items:center;gap:8px;padding:16px 20px;border-top:1px solid #222}
+.page-btn{padding:6px 12px;background:#1a1a1a;border:1px solid #333;border-radius:6px;color:#aaa;font-size:12px;cursor:pointer}
+.page-btn:hover{border-color:#d4a843;color:#d4a843}
+.page-btn.active{background:#d4a843;border-color:#d4a843;color:#000;font-weight:700}
+.page-info{color:#666;font-size:12px;margin-left:auto}
+</style>
+</head>
+<body>
+
+<!-- PIN GATE -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-logo"> REWEAR</div>
+    <div class="gate-sub">Database Editor  Admin Access</div>
+    <div class="pin-row">
+      <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+      <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+      <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+      <input class="pin-digit" type="password" maxlength="1" inputmode="numeric">
+    </div>
+    <div class="pin-error" id="pinError"></div>
+    <button class="btn-enter" id="pinBtn">Enter DB Editor</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo"> DB EDITOR<span>REWEAR Database</span></div>
+    <div class="table-list" id="tableList"></div>
+    <div class="sidebar-footer">
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title">Table: <span id="activeTableName"></span></div>
+      <div class="topbar-actions">
+        <input class="search-box" type="text" placeholder="Search rows..." id="searchInput" oninput="filterRows()">
+        <button class="btn-refresh" onclick="loadTable(currentTable)"> Refresh</button>
+        <button class="btn-add" onclick="openAddModal()">+ Add Row</button>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div class="empty-state">
+        <h3>Select a table</h3>
+        <p>Choose a table from the sidebar to view and edit data</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT/ADD MODAL -->
+<div class="modal-bg" id="modal" style="display:none">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="modalTitle">Edit Row</h3>
+      <button class="modal-close" onclick="closeModal()"></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveRow()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../api/supabase.js"></script>
+<script>
+const TABLES = [
+  'products','sellers','orders','listing_fees','transactions',
+  'earnings','blog_posts','newsletter_subscribers','contact_messages',
+  'admin_sessions','buyers','buyer_addresses','wishlists'
+];
+
+const PIN = '1234';
+let currentTable = null;
+let allRows = [];
+let editingRow = null;
+let currentPage = 1;
+const PAGE_SIZE = 50;
+
+// ---- PIN ----
+const digits = document.querySelectorAll('.pin-digit');
+digits.forEach((d,i) => {
+  d.addEventListener('input', () => {
+    d.value = d.value.replace(/\D/g,'');
+    if(d.value && i < digits.length-1) digits[i+1].focus();
+  });
+  d.addEventListener('keydown', e => {
+    if(e.key==='Backspace' && !d.value && i>0) digits[i-1].focus();
+  });
+});
+
+document.getElementById('pinBtn').onclick = checkPin;
+document.addEventListener('keydown', e => { if(e.key==='Enter') checkPin(); });
+
+function getPin(){ return [...digits].map(d=>d.value).join(''); }
+
+function checkPin(){
+  if(getPin() === PIN){
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    localStorage.setItem('rewear_dbeditor','1');
+    initApp();
+  } else {
+    document.getElementById('pinError').textContent = 'Incorrect PIN. Try again.';
+    digits.forEach(d=>d.value='');
+    digits[0].focus();
+  }
+}
+
+if(localStorage.getItem('rewear_dbeditor')==='1'){
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='flex';
+  initApp();
+}
+
+function logout(){
+  localStorage.removeItem('rewear_dbeditor');
+  location.reload();
+}
+
+// ---- INIT ----
+async function initApp(){
+  const list = document.getElementById('tableList');
+  list.innerHTML = '<div style="padding:10px 20px;color:#555;font-size:12px">Loading tables...</div>';
+  
+  const counts = {};
+  await Promise.all(TABLES.map(async t => {
+    try {
+      const {count} = await db.from(t).select('*',{count:'exact',head:true});
+      counts[t] = count ?? 0;
+    } catch(e){ counts[t] = '?'; }
+  }));
+
+  list.innerHTML = TABLES.map(t => `
+    <button class="table-btn" id="btn-${t}" onclick="loadTable('${t}')">
+      ${t}
+      <span class="table-count">${counts[t]}</span>
+    </button>
+  `).join('');
+}
+
+// ---- LOAD TABLE ----
+async function loadTable(table){
+  currentTable = table;
+  currentPage = 1;
+  document.getElementById('activeTableName').textContent = table;
+  document.querySelectorAll('.table-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+table)?.classList.add('active');
+  document.getElementById('searchInput').value = '';
+
+  const content = document.getElementById('content');
+  content.innerHTML = '<div class="loading"><div class="loading-spin"></div><div>Loading '+table+'...</div></div>';
+
+  const {data, error} = await db.from(table).select('*').order('created_at',{ascending:false}).limit(500);
+  
+  if(error){
+    content.innerHTML = `<div class="empty-state"><h3>Error loading table</h3><p style="color:#ef4444">${error.message}</p><p style="margin-top:12px;color:#555">Make sure you ran RUN_THIS_IN_SUPABASE.sql first</p></div>`;
+    return;
+  }
+
+  allRows = data || [];
+  renderTable(allRows);
+}
+
+// ---- RENDER TABLE ----
+function renderTable(rows){
+  const content = document.getElementById('content');
+  
+  if(!rows.length){
+    content.innerHTML = `<div class="table-wrap"><div class="table-info"><span class="table-info-name">${currentTable}</span><span class="table-info-count">0 rows</span></div><div class="empty-state"><h3>No rows found</h3><p>This table is empty. Click "+ Add Row" to add data.</p></div></div>`;
+    return;
+  }
+
+  const cols = Object.keys(rows[0]);
+  const start = (currentPage-1)*PAGE_SIZE;
+  const pageRows = rows.slice(start, start+PAGE_SIZE);
+  const totalPages = Math.ceil(rows.length/PAGE_SIZE);
+
+  const thead = `<tr>${cols.map(c=>`<th>${c}</th>`).join('')}<th>Actions</th></tr>`;
+  
+  const tbody = pageRows.map(row => {
+    const cells = cols.map(col => {
+      const val = row[col];
+      if(val === null || val === undefined) return `<td><span style="color:#444">null</span></td>`;
+      if(typeof val === 'boolean') return `<td><span class="badge-${val}">${val}</span></td>`;
+      if(col==='status') return `<td><span class="badge-${val}">${val}</span></td>`;
+      if(col==='verified') return `<td><span class="badge-${val}">${val}</span></td>`;
+      if(col.includes('_at') && val) return `<td title="${val}">${new Date(val).toLocaleDateString()}</td>`;
+      if(col==='price'||col==='total_price'||col==='amount'||col==='gross_amount'||col==='seller_payout'||col==='commission_amount') return `<td>${parseFloat(val).toFixed(2)}</td>`;
+      const str = String(val);
+      return `<td title="${str.replace(/"/g,'&quot;')}">${str.length>40?str.slice(0,40)+'':str}</td>`;
+    }).join('');
+    
+    const id = row.id || row[cols[0]];
+    return `<tr>${cells}<td><div class="td-actions">
+      <button class="btn-edit" onclick='openEditModal(${JSON.stringify(row)})'>Edit</button>
+      <button class="btn-del" onclick="deleteRow('${id}')">Delete</button>
+    </div></td></tr>`;
+  }).join('');
+
+  let pagination = '';
+  if(totalPages > 1){
+    const pages = [];
+    for(let i=1;i<=totalPages;i++){
+      pages.push(`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`);
+    }
+    pagination = `<div class="pagination">${pages.join('')}<span class="page-info">Showing ${start+1}${Math.min(start+PAGE_SIZE,rows.length)} of ${rows.length}</span></div>`;
+  }
+
+  content.innerHTML = `
+    <div class="table-wrap">
+      <div class="table-info">
+        <span class="table-info-name">${currentTable}</span>
+        <span class="table-info-count">${rows.length} rows</span>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="tbl"><thead>${thead}</thead><tbody>${tbody}</tbody></table>
+      </div>
+      ${pagination}
+    </div>`;
+}
+
+function goPage(p){ currentPage=p; renderTable(getFilteredRows()); }
+
+function getFilteredRows(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  if(!q) return allRows;
+  return allRows.filter(row => Object.values(row).some(v => String(v).toLowerCase().includes(q)));
+}
+
+function filterRows(){ currentPage=1; renderTable(getFilteredRows()); }
+
+// ---- EDIT MODAL ----
+function openEditModal(row){
+  editingRow = row;
+  document.getElementById('modalTitle').textContent = 'Edit Row  ' + currentTable;
+  const cols = Object.keys(row);
+  document.getElementById('modalBody').innerHTML = cols.map(col => {
+    const val = row[col] === null ? '' : row[col];
+    const isId = col==='id' || col.endsWith('_id') && col!=='seller_id' && col!=='product_id' && col!=='order_id' && col!=='buyer_id';
+    const readonly = col==='id' ? 'readonly' : '';
+    const isArray = Array.isArray(val);
+    const displayVal = isArray ? val.join(',') : val;
+    return `<div class="field-group">
+      <label class="field-label">${col}${col==='id'?' (readonly)':''}</label>
+      <input class="field-input" ${readonly} data-col="${col}" data-isarray="${isArray}" value="${String(displayVal).replace(/"/g,'&quot;')}">
+    </div>`;
+  }).join('');
+  document.getElementById('modal').style.display='flex';
+}
+
+function openAddModal(){
+  if(!currentTable){ showToast('Select a table first','error'); return; }
+  editingRow = null;
+  document.getElementById('modalTitle').textContent = 'Add Row  ' + currentTable;
+  
+  const fieldMap = {
+    products: ['name','price','category','image_url','description','sizes','status','in_stock','seller_id'],
+    sellers: ['business_name','email','phone','description','verified'],
+    orders: ['buyer_name','buyer_email','size_selected','quantity','total_price','status','product_id'],
+    listing_fees: ['seller_id','tier','amount_paid','max_listings','status'],
+    blog_posts: ['title','excerpt','category','image_url','read_time_minutes'],
+    newsletter_subscribers: ['email'],
+    contact_messages: ['first_name','last_name','email','phone','subject','message'],
+    earnings: ['source','reference_id','amount'],
+    buyers: ['name','email','phone'],
+  };
+
+  const fields = fieldMap[currentTable] || ['value'];
+  document.getElementById('modalBody').innerHTML = fields.map(col =>
+    `<div class="field-group">
+      <label class="field-label">${col}</label>
+      <input class="field-input" data-col="${col}" data-isarray="false" value="" placeholder="${col}">
+    </div>`
+  ).join('');
+  document.getElementById('modal').style.display='flex';
+}
+
+function closeModal(){ document.getElementById('modal').style.display='none'; editingRow=null; }
+
+async function saveRow(){
+  const inputs = document.querySelectorAll('#modalBody .field-input');
+  const data = {};
+  inputs.forEach(inp => {
+    if(inp.readOnly) return;
+    const col = inp.dataset.col;
+    const isArray = inp.dataset.isarray === 'true';
+    let val = inp.value.trim();
+    if(val === '') { data[col] = null; return; }
+    if(isArray) { data[col] = val.split(',').map(s=>s.trim()); return; }
+    if(val==='true') { data[col]=true; return; }
+    if(val==='false') { data[col]=false; return; }
+    if(!isNaN(val) && val!=='') { data[col]=parseFloat(val); return; }
+    data[col] = val;
+  });
+
+  let error;
+  if(editingRow){
+    ({error} = await db.from(currentTable).update(data).eq('id', editingRow.id));
+  } else {
+    ({error} = await db.from(currentTable).insert(data));
+  }
+
+  if(error){ showToast('Error: '+error.message,'error'); return; }
+  showToast(editingRow?'Row updated!':'Row added!','success');
+  closeModal();
+  loadTable(currentTable);
+  initApp();
+}
+
+async function deleteRow(id){
+  if(!confirm('Delete this row? This cannot be undone.')) return;
+  const {error} = await db.from(currentTable).delete().eq('id', id);
+  if(error){ showToast('Error: '+error.message,'error'); return; }
+  showToast('Row deleted','success');
+  loadTable(currentTable);
+  initApp();
+}
+
+// ---- TOAST ----
+function showToast(msg, type='success'){
+  const t = document.createElement('div');
+  t.className = 'toast '+type;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 3000);
+}
+
+// Close modal on bg click
+document.getElementById('modal').addEventListener('click', e => {
+  if(e.target.id==='modal') closeModal();
+});
+</script>
+</body>
+</html>
